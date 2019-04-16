@@ -1,0 +1,2027 @@
+<html>
+
+<head>
+<style type="text/css">
+.knitr .inline {
+  background-color: #f7f7f7;
+  border:solid 1px #B0B0B0;
+}
+.error {
+	font-weight: bold;
+	color: #FF0000;
+}
+.warning {
+	font-weight: bold;
+}
+.message {
+	font-style: italic;
+}
+.source, .output, .warning, .error, .message {
+	padding: 0 1em;
+  border:solid 1px #F7F7F7;
+}
+.source {
+  background-color: #f5f5f5;
+}
+.rimage .left {
+  text-align: left;
+}
+.rimage .right {
+  text-align: right;
+}
+.rimage .center {
+  text-align: center;
+}
+.hl.num {
+  color: #AF0F91;
+}
+.hl.str {
+  color: #317ECC;
+}
+.hl.com {
+  color: #AD95AF;
+  font-style: italic;
+}
+.hl.opt {
+  color: #000000;
+}
+.hl.std {
+  color: #585858;
+}
+.hl.kwa {
+  color: #295F94;
+  font-weight: bold;
+}
+.hl.kwb {
+  color: #B05A65;
+}
+.hl.kwc {
+  color: #55aa55;
+}
+.hl.kwd {
+  color: #BC5A65;
+  font-weight: bold;
+}
+</style>
+<title>"Association Rule Mining Using Apriori Algorithm for Fire Incidents In San Francisco"</title>
+</head>
+
+<body>
+
+<p>This is an R HTML document. When you click the <b>Knit HTML</b> button a web page will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+
+<div class="chunk" id="unnamed-chunk-1"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(e1071)</span>
+<span class="hl kwd">library</span><span class="hl std">(lubridate)</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: package 'lubridate' was built under R version 3.4.4
+</pre></div>
+<div class="message"><pre class="knitr r">## 
+## Attaching package: 'lubridate'
+</pre></div>
+<div class="message"><pre class="knitr r">## The following object is masked from 'package:base':
+## 
+##     date
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(tidyverse)</span>
+</pre></div>
+<div class="message"><pre class="knitr r">## ── Attaching packages ────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──
+</pre></div>
+<div class="message"><pre class="knitr r">## ✔ ggplot2 3.0.0.9000     ✔ purrr   0.2.4     
+## ✔ tibble  1.4.2          ✔ dplyr   0.7.6     
+## ✔ tidyr   0.8.0          ✔ stringr 1.2.0     
+## ✔ readr   1.1.1          ✔ forcats 0.3.0
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: package 'dplyr' was built under R version 3.4.4
+</pre></div>
+<div class="message"><pre class="knitr r">## ── Conflicts ───────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ lubridate::as.difftime() masks base::as.difftime()
+## ✖ lubridate::date()        masks base::date()
+## ✖ dplyr::filter()          masks stats::filter()
+## ✖ lubridate::intersect()   masks base::intersect()
+## ✖ dplyr::lag()             masks stats::lag()
+## ✖ lubridate::setdiff()     masks base::setdiff()
+## ✖ lubridate::union()       masks base::union()
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(dplyr)</span>
+<span class="hl kwd">library</span><span class="hl std">(zoo)</span> <span class="hl com">#for seasons</span>
+</pre></div>
+<div class="message"><pre class="knitr r">## 
+## Attaching package: 'zoo'
+</pre></div>
+<div class="message"><pre class="knitr r">## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(chron)</span> <span class="hl com">#for timeperiods</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: package 'chron' was built under R version 3.4.4
+</pre></div>
+<div class="message"><pre class="knitr r">## 
+## Attaching package: 'chron'
+</pre></div>
+<div class="message"><pre class="knitr r">## The following objects are masked from 'package:lubridate':
+## 
+##     days, hours, minutes, seconds, years
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(arules)</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: package 'arules' was built under R version 3.4.4
+</pre></div>
+<div class="message"><pre class="knitr r">## Loading required package: Matrix
+</pre></div>
+<div class="message"><pre class="knitr r">## 
+## Attaching package: 'Matrix'
+</pre></div>
+<div class="message"><pre class="knitr r">## The following object is masked from 'package:tidyr':
+## 
+##     expand
+</pre></div>
+<div class="message"><pre class="knitr r">## 
+## Attaching package: 'arules'
+</pre></div>
+<div class="message"><pre class="knitr r">## The following object is masked from 'package:dplyr':
+## 
+##     recode
+</pre></div>
+<div class="message"><pre class="knitr r">## The following objects are masked from 'package:base':
+## 
+##     abbreviate, write
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(RColorBrewer)</span>
+<span class="hl com">#library(robustbase)</span>
+<span class="hl kwd">library</span><span class="hl std">(arulesViz)</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: package 'arulesViz' was built under R version 3.4.4
+</pre></div>
+<div class="message"><pre class="knitr r">## Loading required package: grid
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Setting the working directory</span>
+<span class="hl kwd">setwd</span><span class="hl std">(</span><span class="hl str">'/Users/chaitra/Desktop/Capstone'</span><span class="hl std">)</span>
+<span class="hl kwd">getwd</span><span class="hl std">()</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;/Users/chaitra/Desktop/Capstone&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Step 1 : Collecting the data</span>
+<span class="hl com">#reading the csv file</span>
+<span class="hl std">firx</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">read.csv</span><span class="hl std">(</span><span class="hl str">&quot;Fireincidents.csv&quot;</span><span class="hl std">,</span><span class="hl kwc">stringsAsFactors</span> <span class="hl std">=</span> <span class="hl num">FALSE</span><span class="hl std">)</span>
+<span class="hl com">#converting incidentdate variable to 'Date' type and filtering</span>
+<span class="hl std">firx</span><span class="hl opt">$</span><span class="hl std">IncidentDate</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.Date</span><span class="hl std">(firx</span><span class="hl opt">$</span><span class="hl std">IncidentDate)</span>
+<span class="hl std">firx</span> <span class="hl kwb">&lt;-</span> <span class="hl std">dplyr</span><span class="hl opt">::</span><span class="hl kwd">filter</span><span class="hl std">(firx, IncidentDate</span> <span class="hl opt">&gt;=</span> <span class="hl str">'2018-01-01'</span> <span class="hl opt">&amp;</span> <span class="hl std">IncidentDate</span> <span class="hl opt">&lt;=</span> <span class="hl str">'2018-12-31'</span><span class="hl std">)</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: package 'bindrcpp' was built under R version 3.4.4
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">str</span><span class="hl std">(firx)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 'data.frame':	26337 obs. of  63 variables:
+##  $ Incident.Number                             : int  18038011 18101492 18104029 18068643 18134061 18037796 18043578 18100799 18025438 18033816 ...
+##  $ Exposure.Number                             : int  1 0 0 0 0 0 0 0 0 0 ...
+##  $ Address                                     : chr  &quot;Yukon Street&quot; &quot;Yosemite/jennings&quot; &quot;Yosemite&quot; &quot;Yosemite&quot; ...
+##  $ IncidentDate                                : Date, format: &quot;2018-03-30&quot; &quot;2018-08-29&quot; ...
+##  $ Call.Number                                 : int  180892895 182412408 182480121 181621178 183192372 180890703 181023679 182393667 180600297 180793701 ...
+##  $ AlarmDtTm                                   : chr  &quot;17:03&quot; &quot;14:52&quot; &quot;1:07&quot; &quot;10:36&quot; ...
+##  $ Arrival.DtTm                                : chr  &quot;3/30/18 17:08&quot; &quot;8/29/18 14:55&quot; &quot;9/5/18 1:12&quot; &quot;6/11/18 10:40&quot; ...
+##  $ Close.DtTm                                  : chr  &quot;3/30/18 17:23&quot; &quot;8/29/18 15:05&quot; &quot;9/5/18 1:25&quot; &quot;6/11/18 10:48&quot; ...
+##  $ City                                        : chr  &quot;San Francisco&quot; &quot;San Francisco&quot; &quot;San Francisco&quot; &quot;San Francisco&quot; ...
+##  $ Zipcode                                     : int  94114 94124 94124 94124 94110 94110 94116 94102 94117 94103 ...
+##  $ Battalion                                   : chr  &quot;B06&quot; &quot;B10&quot; &quot;B10&quot; &quot;B10&quot; ...
+##  $ Station.Area                                : chr  &quot;24&quot; &quot;17&quot; &quot;17&quot; &quot;17&quot; ...
+##  $ Box                                         : chr  &quot;5266&quot; &quot;6546&quot; &quot;6572&quot; &quot;6546&quot; ...
+##  $ Suppression.Units                           : int  0 1 1 1 1 2 2 2 2 1 ...
+##  $ Suppression.Personnel                       : int  0 4 4 4 4 8 9 9 9 4 ...
+##  $ EMS.Units                                   : int  1 1 0 0 0 0 0 0 1 1 ...
+##  $ EMS.Personnel                               : int  4 2 0 0 0 0 0 0 2 2 ...
+##  $ Other.Units                                 : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Other.Personnel                             : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ First.Unit.On.Scene                         : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ EstimatedPropertyLoss                       : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Estimated.Contents.Loss                     : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ FireFatalities                              : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Fire.Injuries                               : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ CivilianFatalities                          : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Civilian.Injuries                           : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Number.of.Alarms                            : logi  NA NA NA NA NA NA ...
+##  $ Primary.Situation                           : chr  &quot;141 forest, woods or wildland fire&quot; &quot;300 rescue, ems incident, other&quot; &quot;118 trash or rubbish fire, contained&quot; &quot;700 false alarm or false call, other&quot; ...
+##  $ Mutual.Aid                                  : chr  &quot;n none&quot; &quot;n none&quot; &quot;n none&quot; &quot;n none&quot; ...
+##  $ Action.Taken.Primary                        : chr  &quot;11 extinguishment by fire service personnel&quot; &quot;31 provide first aid &amp; check for injuries&quot; &quot;10 fire control or extinguishment, other&quot; &quot;86 investigate&quot; ...
+##  $ Action.Taken.Secondary                      : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Action.Taken.Other                          : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Detector.Alerted.Occupants                  : chr  &quot;&quot; &quot;&quot; &quot;2 detector did not alert occupants&quot; &quot;&quot; ...
+##  $ PropertyUse                                 : chr  &quot;931 - open land or field&quot; &quot;960 - street, other&quot; &quot;900 - outside or special property, other&quot; &quot;936 - vacant lot&quot; ...
+##  $ Area.of.Fire.Origin                         : chr  &quot;94 open area, outside; included are farmland, field&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Ignition.Cause                              : chr  &quot;0 cause, other (only used for additional exposures)&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Ignition.Factor.Primary                     : chr  &quot;71 exposure fire&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Ignition.Factor.Secondary                   : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Heat.Source                                 : chr  &quot;61 cigarette&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Item.First.Ignited                          : chr  &quot;70 organic materials, other&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Human.Factors.Associated.with.Ignition      : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Structure.Type                              : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Structure.Status                            : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Floor.of.Fire.Origin                        : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Fire.Spread                                 : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ No.Flame.Spead                              : chr  &quot;no&quot; &quot;na&quot; &quot;na&quot; &quot;na&quot; ...
+##  $ Number.of.floors.with.minimum.damage        : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Number.of.floors.with.significant.damage    : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Number.of.floors.with.heavy.damage          : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Number.of.floors.with.extreme.damage        : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Detectors.Present                           : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Detector.Type                               : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Detector.Operation                          : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Detector.Effectiveness                      : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Detector.Failure.Reason                     : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Automatic.Extinguishing.System.Present      : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Automatic.Extinguishing.Sytem.Type          : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Automatic.Extinguishing.Sytem.Perfomance    : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Automatic.Extinguishing.Sytem.Failure.Reason: chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+##  $ Number.of.Sprinkler.Heads.Operating         : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ Supervisor.District                         : int  8 10 10 10 10 10 4 5 5 6 ...
+##  $ NeighborhoodDistrict                        : chr  &quot;Twin Peaks&quot; &quot;Bayview Hunters Point&quot; &quot;Bayview Hunters Point&quot; &quot;Bayview Hunters Point&quot; ...
+##  $ Location                                    : chr  &quot;(37.75836300002965, -122.441922)&quot; &quot;(37.725794000029616, -122.38980099999999)&quot; &quot;(37.724730000029616, -122.38793)&quot; &quot;(37.724730000029616, -122.38793)&quot; ...
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">fir_x</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">select</span><span class="hl std">(firx,IncidentDate,AlarmDtTm,Zipcode,PropertyUse,Battalion,</span>
+                <span class="hl std">NeighborhoodDistrict)</span>
+<span class="hl kwd">str</span><span class="hl std">(fir_x)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 'data.frame':	26337 obs. of  6 variables:
+##  $ IncidentDate        : Date, format: &quot;2018-03-30&quot; &quot;2018-08-29&quot; ...
+##  $ AlarmDtTm           : chr  &quot;17:03&quot; &quot;14:52&quot; &quot;1:07&quot; &quot;10:36&quot; ...
+##  $ Zipcode             : int  94114 94124 94124 94124 94110 94110 94116 94102 94117 94103 ...
+##  $ PropertyUse         : chr  &quot;931 - open land or field&quot; &quot;960 - street, other&quot; &quot;900 - outside or special property, other&quot; &quot;936 - vacant lot&quot; ...
+##  $ Battalion           : chr  &quot;B06&quot; &quot;B10&quot; &quot;B10&quot; &quot;B10&quot; ...
+##  $ NeighborhoodDistrict: chr  &quot;Twin Peaks&quot; &quot;Bayview Hunters Point&quot; &quot;Bayview Hunters Point&quot; &quot;Bayview Hunters Point&quot; ...
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Calculating the Season based on months</span>
+<span class="hl std">mth</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.yearqtr</span><span class="hl std">(</span><span class="hl kwd">as.yearmon</span><span class="hl std">(fir_x</span><span class="hl opt">$</span><span class="hl std">IncidentDate,</span> <span class="hl str">&quot;%m/%d/%y&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span> <span class="hl num">1</span><span class="hl opt">/</span><span class="hl num">12</span><span class="hl std">)</span>
+<span class="hl std">fir_x</span><span class="hl opt">$</span><span class="hl std">Season</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">factor</span><span class="hl std">(</span><span class="hl kwd">format</span><span class="hl std">(mth,</span> <span class="hl str">&quot;%q&quot;</span><span class="hl std">),</span> <span class="hl kwc">levels</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">4</span><span class="hl std">,</span>
+                        <span class="hl kwc">labels</span> <span class="hl std">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;Winter&quot;</span><span class="hl std">,</span><span class="hl str">&quot;Spring&quot;</span><span class="hl std">,</span><span class="hl str">&quot;Summer&quot;</span><span class="hl std">,</span><span class="hl str">&quot;Fall&quot;</span><span class="hl std">))</span>
+<span class="hl kwd">table</span><span class="hl std">(fir_x</span><span class="hl opt">$</span><span class="hl std">Season)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+## Winter Spring Summer   Fall 
+##   7915   7756   7880   2786
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Converting alarmdttm variable from 'char' to 'time' variable</span>
+<span class="hl std">fir_x</span><span class="hl opt">$</span><span class="hl std">AlarmDtTm</span><span class="hl kwb">&lt;-</span> <span class="hl kwd">as.POSIXct</span><span class="hl std">(fir_x</span><span class="hl opt">$</span><span class="hl std">AlarmDtTm,</span> <span class="hl kwc">format</span> <span class="hl std">=</span> <span class="hl str">&quot;%H:%M&quot;</span><span class="hl std">)</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">format</span><span class="hl std">(</span><span class="hl str">&quot;%H:%M:%S&quot;</span><span class="hl std">)</span>
+<span class="hl com">#Calculating the time_period based on 3-hr time frame</span>
+<span class="hl std">fir_x</span><span class="hl opt">$</span><span class="hl std">Time_period</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">cut</span><span class="hl std">(chron</span><span class="hl opt">::</span><span class="hl kwd">times</span><span class="hl std">(fir_x</span><span class="hl opt">$</span><span class="hl std">AlarmDtTm) ,</span> <span class="hl kwc">breaks</span> <span class="hl std">= (</span><span class="hl num">1</span><span class="hl opt">/</span><span class="hl num">24</span><span class="hl std">)</span> <span class="hl opt">*</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">0</span><span class="hl std">,</span><span class="hl num">3</span><span class="hl std">,</span><span class="hl num">6</span><span class="hl std">,</span><span class="hl num">9</span><span class="hl std">,</span><span class="hl num">12</span><span class="hl std">,</span><span class="hl num">15</span><span class="hl std">,</span><span class="hl num">18</span><span class="hl std">,</span><span class="hl num">21</span><span class="hl std">,</span><span class="hl num">24</span><span class="hl std">),</span>
+                          <span class="hl kwc">labels</span> <span class="hl std">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;Early-Night&quot;</span><span class="hl std">,</span><span class="hl str">&quot;Late-Night&quot;</span><span class="hl std">,</span><span class="hl str">&quot;Early-Morning&quot;</span><span class="hl std">,</span><span class="hl str">&quot;Late-Morning&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;Early-Afternoon&quot;</span><span class="hl std">,</span><span class="hl str">&quot;Late-Afternoon&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;Early-Evening&quot;</span><span class="hl std">,</span><span class="hl str">&quot;Late-Evening&quot;</span><span class="hl std">))</span>
+<span class="hl kwd">table</span><span class="hl std">(fir_x</span><span class="hl opt">$</span><span class="hl std">Time_period)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+##     Early-Night      Late-Night   Early-Morning    Late-Morning 
+##            2144            1640            2611            3946 
+## Early-Afternoon  Late-Afternoon   Early-Evening    Late-Evening 
+##            4156            4386            4236            3208
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Selecting the required columns and writing it into a .csv file</span>
+<span class="hl std">fir_x</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">select</span><span class="hl std">(fir_x,Zipcode,Season,Time_period,PropertyUse,Battalion,</span>
+                <span class="hl std">NeighborhoodDistrict)</span>
+<span class="hl com">#write.csv(fir_x,file = &quot;display.csv&quot;,row.names = FALSE)</span>
+<span class="hl kwd">write.csv</span><span class="hl std">(fir_x,</span><span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;display1.csv&quot;</span><span class="hl std">,</span><span class="hl kwc">row.names</span> <span class="hl std">=</span> <span class="hl num">FALSE</span><span class="hl std">)</span>
+<span class="hl std">dsply</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">read.csv</span><span class="hl std">(</span><span class="hl str">&quot;display1.csv&quot;</span><span class="hl std">)</span>
+
+<span class="hl com">#BarPlot for Zipcode with accidents</span>
+<span class="hl std">bx</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(</span><span class="hl kwd">table</span><span class="hl std">(dsply</span><span class="hl opt">$</span><span class="hl std">Zipcode))</span> <span class="hl com">#Converting non-numeric to table with freq</span>
+<span class="hl std">bx_order</span> <span class="hl kwb">&lt;-</span> <span class="hl std">bx</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">rename</span><span class="hl std">(</span><span class="hl kwc">Zipcodes</span> <span class="hl std">= Var1)</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">arrange</span><span class="hl std">(</span><span class="hl kwd">desc</span><span class="hl std">(Freq))</span>
+<span class="hl kwd">print</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">'The Zipcode with most accidents is:'</span><span class="hl std">,bx_order[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span><span class="hl str">'with a frequency of'</span><span class="hl std">,bx_order[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">2</span><span class="hl std">]))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;The Zipcode with most accidents is: 94103 with a frequency of 2723&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">bx_order</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(bx_order)</span>
+
+
+<span class="hl com">#Barplot for Season with accidents</span>
+<span class="hl std">Ssn</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(</span><span class="hl kwd">table</span><span class="hl std">(dsply</span><span class="hl opt">$</span><span class="hl std">Season))</span>
+<span class="hl std">Ssn</span> <span class="hl kwb">&lt;-</span> <span class="hl std">Ssn</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">rename</span><span class="hl std">(</span><span class="hl kwc">season</span> <span class="hl std">= Var1)</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">arrange</span><span class="hl std">(</span><span class="hl kwd">desc</span><span class="hl std">(Freq))</span>
+<span class="hl kwd">print</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">'The Season with most accidents is:'</span><span class="hl std">,Ssn[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span><span class="hl str">'with a frequency of'</span><span class="hl std">,Ssn[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">2</span><span class="hl std">]))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;The Season with most accidents is: Winter with a frequency of 7915&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Barplot for Property with accidents</span>
+<span class="hl std">Prop</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(</span><span class="hl kwd">table</span><span class="hl std">(dsply</span><span class="hl opt">$</span><span class="hl std">PropertyUse))</span>
+<span class="hl std">Prop</span> <span class="hl kwb">&lt;-</span> <span class="hl std">Prop</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">arrange</span><span class="hl std">(</span><span class="hl kwd">desc</span><span class="hl std">(Freq))</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">rename</span><span class="hl std">(</span><span class="hl kwc">property</span> <span class="hl std">= Var1)</span>
+<span class="hl kwd">print</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">'The Property with most accidents is:'</span><span class="hl std">,Prop[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span><span class="hl str">'with a frequency of'</span><span class="hl std">,Prop[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">2</span><span class="hl std">]))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;The Property with most accidents is: 429 - multifamily dwellings with a frequency of 5774&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Barplot for Neighborhood District with Accidents</span>
+<span class="hl std">ND</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(</span><span class="hl kwd">table</span><span class="hl std">(dsply</span><span class="hl opt">$</span><span class="hl std">NeighborhoodDistrict))</span>
+<span class="hl std">ND</span> <span class="hl kwb">&lt;-</span> <span class="hl std">ND</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">arrange</span><span class="hl std">(</span><span class="hl kwd">desc</span><span class="hl std">(Freq))</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">rename</span><span class="hl std">(</span><span class="hl kwc">neighborhood</span> <span class="hl std">= Var1)</span>
+<span class="hl kwd">print</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">'The Neighborhood with most accidents is:'</span><span class="hl std">,ND[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span><span class="hl str">'with a frequency of'</span><span class="hl std">,ND[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">2</span><span class="hl std">]))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;The Neighborhood with most accidents is: Tenderloin with a frequency of 2551&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Barplot for Timeperiods of Accidents</span>
+<span class="hl std">TP</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(</span><span class="hl kwd">table</span><span class="hl std">(dsply</span><span class="hl opt">$</span><span class="hl std">Time_period))</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">rename</span><span class="hl std">(</span><span class="hl kwc">Timeperiod</span> <span class="hl std">= Var1)</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">arrange</span><span class="hl std">(</span><span class="hl kwd">desc</span><span class="hl std">(Freq))</span>
+<span class="hl kwd">print</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">'The Time_period with most accidents is:'</span><span class="hl std">,TP[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span><span class="hl str">'with a frequency of'</span><span class="hl std">,TP[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">2</span><span class="hl std">]))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;The Time_period with most accidents is: Late-Afternoon with a frequency of 4386&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Barplot for Battalion</span>
+<span class="hl std">Batt</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(</span><span class="hl kwd">table</span><span class="hl std">(dsply</span><span class="hl opt">$</span><span class="hl std">Battalion))</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">rename</span><span class="hl std">(</span><span class="hl kwc">battalion</span> <span class="hl std">= Var1)</span> <span class="hl opt">%&gt;%</span> <span class="hl kwd">arrange</span><span class="hl std">(</span><span class="hl kwd">desc</span><span class="hl std">(Freq))</span>
+<span class="hl kwd">print</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">'The Battalion with maximum first responses is:'</span><span class="hl std">,Batt[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span><span class="hl str">'with a frequency of'</span><span class="hl std">,Batt[</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">2</span><span class="hl std">]))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;The Battalion with maximum first responses is: B03 with a frequency of 4255&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Support and confidence values</span>
+<span class="hl std">supportLevels</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">0.1</span><span class="hl std">,</span> <span class="hl num">0.05</span><span class="hl std">,</span> <span class="hl num">0.01</span><span class="hl std">,</span> <span class="hl num">0.005</span><span class="hl std">)</span>
+<span class="hl std">confidenceLevels</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">0.9</span><span class="hl std">,</span> <span class="hl num">0.8</span><span class="hl std">,</span> <span class="hl num">0.7</span><span class="hl std">,</span> <span class="hl num">0.6</span><span class="hl std">,</span> <span class="hl num">0.5</span><span class="hl std">,</span> <span class="hl num">0.4</span><span class="hl std">,</span> <span class="hl num">0.3</span><span class="hl std">,</span> <span class="hl num">0.2</span><span class="hl std">,</span> <span class="hl num">0.1</span><span class="hl std">)</span>
+
+<span class="hl com"># Empty integers </span>
+<span class="hl std">rules_sup10</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">integer</span><span class="hl std">(</span><span class="hl kwc">length</span><span class="hl std">=</span><span class="hl num">9</span><span class="hl std">)</span>
+<span class="hl std">rules_sup5</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">integer</span><span class="hl std">(</span><span class="hl kwc">length</span><span class="hl std">=</span><span class="hl num">9</span><span class="hl std">)</span>
+<span class="hl std">rules_sup1</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">integer</span><span class="hl std">(</span><span class="hl kwc">length</span><span class="hl std">=</span><span class="hl num">9</span><span class="hl std">)</span>
+<span class="hl std">rules_sup0.5</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">integer</span><span class="hl std">(</span><span class="hl kwc">length</span><span class="hl std">=</span><span class="hl num">9</span><span class="hl std">)</span>
+
+<span class="hl com"># Apriori algorithm with a support level of 10%</span>
+<span class="hl kwa">for</span> <span class="hl std">(i</span> <span class="hl kwa">in</span> <span class="hl num">1</span><span class="hl opt">:</span><span class="hl kwd">length</span><span class="hl std">(confidenceLevels)) {</span>
+
+  <span class="hl std">rules_sup10[i]</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">length</span><span class="hl std">(</span><span class="hl kwd">apriori</span><span class="hl std">(dsply,</span> <span class="hl kwc">parameter</span><span class="hl std">=</span><span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">sup</span><span class="hl std">=supportLevels[</span><span class="hl num">1</span><span class="hl std">],</span>
+                                                         <span class="hl kwc">conf</span><span class="hl std">=confidenceLevels[i],</span> <span class="hl kwc">target</span><span class="hl std">=</span><span class="hl str">&quot;rules&quot;</span><span class="hl std">)))</span>
+
+<span class="hl std">}</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.9    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [0 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.8    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [1 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.7    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [2 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.6    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [2 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.5    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [2 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.4    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [3 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.3    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [14 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.2    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [17 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.1    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 2633 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [18 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [28 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Apriori algorithm with a support level of 5%</span>
+<span class="hl kwa">for</span> <span class="hl std">(i</span> <span class="hl kwa">in</span> <span class="hl num">1</span><span class="hl opt">:</span><span class="hl kwd">length</span><span class="hl std">(confidenceLevels)) {</span>
+
+  <span class="hl std">rules_sup5[i]</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">length</span><span class="hl std">(</span><span class="hl kwd">apriori</span><span class="hl std">(dsply,</span> <span class="hl kwc">parameter</span><span class="hl std">=</span><span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">sup</span><span class="hl std">=supportLevels[</span><span class="hl num">2</span><span class="hl std">],</span>
+                                                        <span class="hl kwc">conf</span><span class="hl std">=confidenceLevels[i],</span> <span class="hl kwc">target</span><span class="hl std">=</span><span class="hl str">&quot;rules&quot;</span><span class="hl std">)))</span>
+
+<span class="hl std">}</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.9    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [4 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.8    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [7 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.7    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [13 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.6    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [13 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.5    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [16 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.4    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [18 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.3    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [54 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.2    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [74 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.1    0.1    1 none FALSE            TRUE       5    0.05      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 1316 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [35 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 done [0.00s].
+## writing ... [103 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Apriori algorithm with a support level of 1%</span>
+<span class="hl kwa">for</span> <span class="hl std">(i</span> <span class="hl kwa">in</span> <span class="hl num">1</span><span class="hl opt">:</span><span class="hl kwd">length</span><span class="hl std">(confidenceLevels)) {</span>
+
+  <span class="hl std">rules_sup1[i]</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">length</span><span class="hl std">(</span><span class="hl kwd">apriori</span><span class="hl std">(dsply,</span> <span class="hl kwc">parameter</span><span class="hl std">=</span><span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">sup</span><span class="hl std">=supportLevels[</span><span class="hl num">3</span><span class="hl std">],</span>
+                                                        <span class="hl kwc">conf</span><span class="hl std">=confidenceLevels[i],</span> <span class="hl kwc">target</span><span class="hl std">=</span><span class="hl str">&quot;rules&quot;</span><span class="hl std">)))</span>
+
+<span class="hl std">}</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.9    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [120 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.8    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [153 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.7    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [218 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.6    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [256 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.5    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.02s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.02s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [297 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.4    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.02s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [361 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.3    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.02s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.03s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [707 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.2    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [1023 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.1    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [72 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [1481 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Apriori algorithm with a support level of 0.5%</span>
+<span class="hl kwa">for</span> <span class="hl std">(i</span> <span class="hl kwa">in</span> <span class="hl num">1</span><span class="hl opt">:</span><span class="hl kwd">length</span><span class="hl std">(confidenceLevels)) {</span>
+
+  <span class="hl std">rules_sup0.5[i]</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">length</span><span class="hl std">(</span><span class="hl kwd">apriori</span><span class="hl std">(dsply,</span> <span class="hl kwc">parameter</span><span class="hl std">=</span><span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">sup</span><span class="hl std">=supportLevels[</span><span class="hl num">4</span><span class="hl std">],</span>
+                                                          <span class="hl kwc">conf</span><span class="hl std">=confidenceLevels[i],</span> <span class="hl kwc">target</span><span class="hl std">=</span><span class="hl str">&quot;rules&quot;</span><span class="hl std">)))</span>
+
+<span class="hl std">}</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.9    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [349 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.8    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [442 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.7    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [596 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.6    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [716 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.5    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [846 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.4    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [1028 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.3    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [1778 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.2    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [2520 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Column(s) 1 not logical or factor. Applying default discretization
+## (see '? discretizeDF').
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.1    0.1    1 none FALSE            TRUE       5   0.005      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 131 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[207 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [84 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.01s].
+## writing ... [3711 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Number of rules found with a support level of 10%</span>
+<span class="hl std">plot1</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">qplot</span><span class="hl std">(confidenceLevels, rules_sup10,</span> <span class="hl kwc">geom</span><span class="hl std">=</span><span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;point&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;line&quot;</span><span class="hl std">),</span>
+               <span class="hl kwc">xlab</span><span class="hl std">=</span><span class="hl str">&quot;Confidence level&quot;</span><span class="hl std">,</span> <span class="hl kwc">ylab</span><span class="hl std">=</span><span class="hl str">&quot;Number of rules found&quot;</span><span class="hl std">,</span>
+               <span class="hl kwc">main</span><span class="hl std">=</span><span class="hl str">&quot;Apriori with a support level of 10%&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span>
+  <span class="hl kwd">theme_bw</span><span class="hl std">()</span>
+
+<span class="hl com"># Number of rules found with a support level of 5%</span>
+<span class="hl std">plot2</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">qplot</span><span class="hl std">(confidenceLevels, rules_sup5,</span> <span class="hl kwc">geom</span><span class="hl std">=</span><span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;point&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;line&quot;</span><span class="hl std">),</span>
+               <span class="hl kwc">xlab</span><span class="hl std">=</span><span class="hl str">&quot;Confidence level&quot;</span><span class="hl std">,</span> <span class="hl kwc">ylab</span><span class="hl std">=</span><span class="hl str">&quot;Number of rules found&quot;</span><span class="hl std">,</span>
+               <span class="hl kwc">main</span><span class="hl std">=</span><span class="hl str">&quot;Apriori with a support level of 5%&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span>
+  <span class="hl kwd">theme_bw</span><span class="hl std">()</span>
+
+<span class="hl com"># Number of rules found with a support level of 1%</span>
+<span class="hl std">plot3</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">qplot</span><span class="hl std">(confidenceLevels, rules_sup1,</span> <span class="hl kwc">geom</span><span class="hl std">=</span><span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;point&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;line&quot;</span><span class="hl std">),</span>
+               <span class="hl kwc">xlab</span><span class="hl std">=</span><span class="hl str">&quot;Confidence level&quot;</span><span class="hl std">,</span> <span class="hl kwc">ylab</span><span class="hl std">=</span><span class="hl str">&quot;Number of rules found&quot;</span><span class="hl std">,</span>
+               <span class="hl kwc">main</span><span class="hl std">=</span><span class="hl str">&quot;Apriori with a support level of 1%&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span>
+  <span class="hl kwd">theme_bw</span><span class="hl std">()</span>
+
+<span class="hl com"># Number of rules found with a support level of 0.5%</span>
+<span class="hl std">plot4</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">qplot</span><span class="hl std">(confidenceLevels, rules_sup0.5,</span> <span class="hl kwc">geom</span><span class="hl std">=</span><span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;point&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;line&quot;</span><span class="hl std">),</span>
+               <span class="hl kwc">xlab</span><span class="hl std">=</span><span class="hl str">&quot;Confidence level&quot;</span><span class="hl std">,</span> <span class="hl kwc">ylab</span><span class="hl std">=</span><span class="hl str">&quot;Number of rules found&quot;</span><span class="hl std">,</span>
+               <span class="hl kwc">main</span><span class="hl std">=</span><span class="hl str">&quot;Apriori with a support level of 0.5%&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span>
+  <span class="hl kwd">theme_bw</span><span class="hl std">()</span>
+<span class="hl com">#install.packages('gridExtra')</span>
+<span class="hl kwd">library</span><span class="hl std">(</span><span class="hl str">'gridExtra'</span><span class="hl std">)</span>
+</pre></div>
+<div class="message"><pre class="knitr r">## 
+## Attaching package: 'gridExtra'
+</pre></div>
+<div class="message"><pre class="knitr r">## The following object is masked from 'package:dplyr':
+## 
+##     combine
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(</span><span class="hl str">'ggplot2'</span><span class="hl std">)</span>
+<span class="hl com"># Subplot</span>
+<span class="hl kwd">grid.arrange</span><span class="hl std">(plot1, plot2, plot3, plot4,</span> <span class="hl kwc">ncol</span><span class="hl std">=</span><span class="hl num">2</span><span class="hl std">)</span>
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-1.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl com"># Data frame</span>
+<span class="hl std">num_rules</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">data.frame</span><span class="hl std">(rules_sup10, rules_sup5, rules_sup1, rules_sup0.5, confidenceLevels)</span>
+
+<span class="hl com"># Number of rules found with a support level of 10%, 5%, 1% and 0.5%</span>
+<span class="hl kwd">ggplot</span><span class="hl std">(</span><span class="hl kwc">data</span><span class="hl std">=num_rules,</span> <span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">x</span><span class="hl std">=confidenceLevels))</span> <span class="hl opt">+</span>
+
+<span class="hl com"># Plot line and points (support level of 10%)</span>
+<span class="hl kwd">geom_line</span><span class="hl std">(</span><span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">y</span><span class="hl std">=rules_sup10,</span> <span class="hl kwc">colour</span><span class="hl std">=</span><span class="hl str">&quot;Support level of 10%&quot;</span><span class="hl std">))</span> <span class="hl opt">+</span>
+<span class="hl kwd">geom_point</span><span class="hl std">(</span><span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">y</span><span class="hl std">=rules_sup10,</span> <span class="hl kwc">colour</span><span class="hl std">=</span><span class="hl str">&quot;Support level of 10%&quot;</span><span class="hl std">))</span> <span class="hl opt">+</span>
+
+<span class="hl com"># Plot line and points (support level of 5%)</span>
+<span class="hl kwd">geom_line</span><span class="hl std">(</span><span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">y</span><span class="hl std">=rules_sup5,</span> <span class="hl kwc">colour</span><span class="hl std">=</span><span class="hl str">&quot;Support level of 5%&quot;</span><span class="hl std">))</span> <span class="hl opt">+</span>
+<span class="hl kwd">geom_point</span><span class="hl std">(</span><span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">y</span><span class="hl std">=rules_sup5,</span> <span class="hl kwc">colour</span><span class="hl std">=</span><span class="hl str">&quot;Support level of 5%&quot;</span><span class="hl std">))</span> <span class="hl opt">+</span>
+
+<span class="hl com"># Plot line and points (support level of 1%)</span>
+<span class="hl kwd">geom_line</span><span class="hl std">(</span><span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">y</span><span class="hl std">=rules_sup1,</span> <span class="hl kwc">colour</span><span class="hl std">=</span><span class="hl str">&quot;Support level of 1%&quot;</span><span class="hl std">))</span> <span class="hl opt">+</span>
+<span class="hl kwd">geom_point</span><span class="hl std">(</span><span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">y</span><span class="hl std">=rules_sup1,</span> <span class="hl kwc">colour</span><span class="hl std">=</span><span class="hl str">&quot;Support level of 1%&quot;</span><span class="hl std">))</span> <span class="hl opt">+</span>
+
+<span class="hl com"># Plot line and points (support level of 0.5%)</span>
+<span class="hl kwd">geom_line</span><span class="hl std">(</span><span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">y</span><span class="hl std">=rules_sup0.5,</span> <span class="hl kwc">colour</span><span class="hl std">=</span><span class="hl str">&quot;Support level of 0.5%&quot;</span><span class="hl std">))</span> <span class="hl opt">+</span>
+<span class="hl kwd">geom_point</span><span class="hl std">(</span><span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">y</span><span class="hl std">=rules_sup0.5,</span> <span class="hl kwc">colour</span><span class="hl std">=</span><span class="hl str">&quot;Support level of 0.5%&quot;</span><span class="hl std">))</span> <span class="hl opt">+</span>
+
+<span class="hl com"># Labs and theme</span>
+<span class="hl kwd">labs</span><span class="hl std">(</span><span class="hl kwc">x</span><span class="hl std">=</span><span class="hl str">&quot;Confidence levels&quot;</span><span class="hl std">,</span> <span class="hl kwc">y</span><span class="hl std">=</span><span class="hl str">&quot;Number of rules found&quot;</span><span class="hl std">,</span>
+    <span class="hl kwc">title</span><span class="hl std">=</span><span class="hl str">&quot;Apriori algorithm with different support levels&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span>
+  <span class="hl kwd">theme_bw</span><span class="hl std">()</span> <span class="hl opt">+</span>
+  <span class="hl kwd">theme</span><span class="hl std">(</span><span class="hl kwc">legend.title</span><span class="hl std">=</span><span class="hl kwd">element_blank</span><span class="hl std">())</span>
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-2.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl com">#Writing a csv file for analysis</span>
+<span class="hl com">#write.csv(fir_x, file = &quot;firx.csv&quot;,row.names = FALSE)</span>
+<span class="hl std">firy</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">read.transactions</span><span class="hl std">(</span><span class="hl str">&quot;display1.csv&quot;</span><span class="hl std">,</span> <span class="hl kwc">sep</span> <span class="hl std">=</span> <span class="hl str">&quot;,&quot;</span><span class="hl std">,</span><span class="hl kwc">format</span> <span class="hl std">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;basket&quot;</span><span class="hl std">),</span><span class="hl kwc">skip</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">)</span>
+<span class="hl kwd">summary</span><span class="hl std">(firy)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## transactions as itemMatrix in sparse format with
+##  26337 rows (elements/itemsets/transactions) and
+##  230 columns (items) and a density of 0.02604635 
+## 
+## most frequent items:
+##                      Winter                      Summer 
+##                        7915                        7880 
+##                      Spring 429 - multifamily dwellings 
+##                        7756                        5774 
+##              Late-Afternoon                     (Other) 
+##                        4386                      124065 
+## 
+## element (itemset/transaction) length distribution:
+## sizes
+##     4     5     6 
+##   112    22 26203 
+## 
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   4.000   6.000   6.000   5.991   6.000   6.000 
+## 
+## includes extended item information - examples:
+##                      labels
+## 1 000 - property use, other
+## 2      0000 tent/encampment
+## 3     100 - assembly, other
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">inspect</span><span class="hl std">(firy[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">5</span><span class="hl std">])</span> <span class="hl com">#Reading the first 5 rows of the sparse matrix</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##     items                                     
+## [1] {931 - open land or field,                
+##      94114,                                   
+##      B06,                                     
+##      Late-Afternoon,                          
+##      Spring,                                  
+##      Twin Peaks}                              
+## [2] {94124,                                   
+##      960 - street, other,                     
+##      B10,                                     
+##      Bayview Hunters Point,                   
+##      Early-Afternoon,                         
+##      Summer}                                  
+## [3] {900 - outside or special property, other,
+##      94124,                                   
+##      B10,                                     
+##      Bayview Hunters Point,                   
+##      Early-Night,                             
+##      Fall}                                    
+## [4] {936 - vacant lot,                        
+##      94124,                                   
+##      B10,                                     
+##      Bayview Hunters Point,                   
+##      Late-Morning,                            
+##      Summer}                                  
+## [5] {900 - outside or special property, other,
+##      94110,                                   
+##      B06,                                     
+##      Early-Afternoon,                         
+##      Fall,                                    
+##      Mission}
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">itemFrequency</span><span class="hl std">(firy[,</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">5</span><span class="hl std">])</span> <span class="hl com">#support of the first 5 measures</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##                000 - property use, other 
+##                             0.0352735695 
+##                     0000 tent/encampment 
+##                             0.0039867866 
+##                    100 - assembly, other 
+##                             0.0023920720 
+## 110 - fixed use recreation places, other 
+##                             0.0010251737 
+##                      111 - bowling alley 
+##                             0.0001139082
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">arules</span><span class="hl opt">::</span><span class="hl kwd">itemFrequencyPlot</span><span class="hl std">(firy,</span><span class="hl kwc">topN</span><span class="hl std">=</span><span class="hl num">15</span><span class="hl std">,</span><span class="hl kwc">col</span><span class="hl std">=</span><span class="hl kwd">brewer.pal</span><span class="hl std">(</span><span class="hl num">8</span><span class="hl std">,</span><span class="hl str">'Pastel2'</span><span class="hl std">),</span><span class="hl kwc">main</span><span class="hl std">=</span><span class="hl str">'Relative variable Frequency Plot'</span><span class="hl std">,</span>
+                          <span class="hl kwc">type</span><span class="hl std">=</span><span class="hl str">&quot;relative&quot;</span><span class="hl std">,</span><span class="hl kwc">ylab</span><span class="hl std">=</span><span class="hl str">&quot;Variable Frequency (Relative)&quot;</span><span class="hl std">)</span>
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-3.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl kwd">image</span><span class="hl std">(firy[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">])</span> <span class="hl com">#plotting sparse matrix for 20 rows and 230 columns</span>
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-4.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl kwd">image</span><span class="hl std">(</span><span class="hl kwd">sample</span><span class="hl std">(firy,</span><span class="hl num">200</span><span class="hl std">))</span> <span class="hl com">#plotting sparse matrix for 200 rows and 230 columns</span>
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-5.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl com">#training aprori model on the data</span>
+<span class="hl std">firyrules</span><span class="hl kwb">&lt;-</span> <span class="hl kwd">apriori</span><span class="hl std">(firy,</span><span class="hl kwc">parameter</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">support</span> <span class="hl std">=</span> <span class="hl num">0.01</span><span class="hl std">,</span><span class="hl kwc">confidence</span> <span class="hl std">=</span> <span class="hl num">0.25</span><span class="hl std">))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##        0.25    0.1    1 none FALSE            TRUE       5    0.01      1
+##  maxlen target   ext
+##      10  rules FALSE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 263 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[230 item(s), 26337 transaction(s)] done [0.01s].
+## sorting and recoding items ... [93 item(s)] done [0.00s].
+## creating transaction tree ... done [0.01s].
+## checking subsets of size 1 2 3 4 done [0.00s].
+## writing ... [691 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.01s].
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">firyrules</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## set of 691 rules
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">summary</span><span class="hl std">(firyrules)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## set of 691 rules
+## 
+## rule length distribution (lhs + rhs):sizes
+##   1   2   3   4 
+##   3 302 346  40 
+## 
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   1.000   2.000   3.000   2.612   3.000   4.000 
+## 
+## summary of quality measures:
+##     support          confidence          lift             count       
+##  Min.   :0.01002   Min.   :0.2512   Min.   : 0.8541   Min.   : 264.0  
+##  1st Qu.:0.01211   1st Qu.:0.3029   1st Qu.: 1.0471   1st Qu.: 319.0  
+##  Median :0.01526   Median :0.4033   Median : 3.9724   Median : 402.0  
+##  Mean   :0.02090   Mean   :0.5250   Mean   : 7.0790   Mean   : 550.5  
+##  3rd Qu.:0.02293   3rd Qu.:0.7138   3rd Qu.:10.3313   3rd Qu.: 604.0  
+##  Max.   :0.30053   Max.   :1.0000   Max.   :45.6979   Max.   :7915.0  
+## 
+## mining info:
+##  data ntransactions support confidence
+##  firy         26337    0.01       0.25
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">inspect</span><span class="hl std">(firyrules[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##      lhs                             rhs                  support   
+## [1]  {}                           =&gt; {Spring}             0.29449064
+## [2]  {}                           =&gt; {Summer}             0.29919885
+## [3]  {}                           =&gt; {Winter}             0.30052777
+## [4]  {94158}                      =&gt; {B03}                0.01002392
+## [5]  {94127}                      =&gt; {West of Twin Peaks} 0.01173254
+## [6]  {West of Twin Peaks}         =&gt; {94127}              0.01173254
+## [7]  {Oceanview/Merced/Ingleside} =&gt; {B09}                0.01154270
+## [8]  {Inner Richmond}             =&gt; {94118}              0.01347914
+## [9]  {94118}                      =&gt; {Inner Richmond}     0.01347914
+## [10] {Inner Richmond}             =&gt; {B07}                0.01351711
+## [11] {Haight Ashbury}             =&gt; {94117}              0.01366898
+## [12] {94117}                      =&gt; {Haight Ashbury}     0.01366898
+## [13] {Haight Ashbury}             =&gt; {B05}                0.01370695
+## [14] {Excelsior}                  =&gt; {94112}              0.01302350
+## [15] {94112}                      =&gt; {Excelsior}          0.01302350
+## [16] {Excelsior}                  =&gt; {B09}                0.01408665
+## [17] {Noe Valley}                 =&gt; {B06}                0.01518776
+## [18] {Lakeshore}                  =&gt; {94132}              0.01644075
+## [19] {94132}                      =&gt; {Lakeshore}          0.01644075
+## [20] {Lakeshore}                  =&gt; {B08}                0.01647872
+##      confidence lift      count
+## [1]  0.2944906   1.000000 7756 
+## [2]  0.2991988   1.000000 7880 
+## [3]  0.3005278   1.000000 7915 
+## [4]  1.0000000   6.189659  264 
+## [5]  0.9872204  39.756001  309 
+## [6]  0.4724771  39.756001  309 
+## [7]  0.9650794  14.351945  304 
+## [8]  0.9971910  32.993743  355 
+## [9]  0.4459799  32.993743  355 
+## [10] 1.0000000  18.404612  356 
+## [11] 0.9944751  29.661939  360 
+## [12] 0.4077010  29.661939  360 
+## [13] 0.9972376  14.305145  361 
+## [14] 0.9220430  22.036159  343 
+## [15] 0.3112523  22.036159  343 
+## [16] 0.9973118  14.831283  371 
+## [17] 1.0000000  13.603822  400 
+## [18] 0.9976959  37.008895  433 
+## [19] 0.6098592  37.008895  433 
+## [20] 1.0000000  12.081193  434
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#improving the model by sorting and subsetting</span>
+<span class="hl kwd">inspect</span><span class="hl std">(</span><span class="hl kwd">sort</span><span class="hl std">(firyrules,</span> <span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;lift&quot;</span><span class="hl std">)[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">8</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##     lhs                     rhs                  support    confidence
+## [1] {94132,B08}          =&gt; {Lakeshore}          0.01644075 0.7530435 
+## [2] {94127}              =&gt; {West of Twin Peaks} 0.01173254 0.9872204 
+## [3] {West of Twin Peaks} =&gt; {94127}              0.01173254 0.4724771 
+## [4] {94118,B07}          =&gt; {Inner Richmond}     0.01347914 0.5370651 
+## [5] {94107,B10}          =&gt; {Potrero Hill}       0.01408665 0.9321608 
+## [6] {Lakeshore}          =&gt; {94132}              0.01644075 0.9976959 
+## [7] {94132}              =&gt; {Lakeshore}          0.01644075 0.6098592 
+## [8] {B08,Lakeshore}      =&gt; {94132}              0.01644075 0.9976959 
+##     lift     count
+## [1] 45.69794 433  
+## [2] 39.75600 309  
+## [3] 39.75600 309  
+## [4] 39.73225 355  
+## [5] 37.25390 371  
+## [6] 37.00890 433  
+## [7] 37.00890 433  
+## [8] 37.00890 433
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">improv</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">subset</span><span class="hl std">(firyrules,items</span> <span class="hl opt">%ain%</span> <span class="hl str">&quot;B03&quot;</span><span class="hl std">)</span> <span class="hl com">#subset for frequent Battalion</span>
+<span class="hl kwd">inspect</span><span class="hl std">(</span><span class="hl kwd">sort</span><span class="hl std">(improv,</span><span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;lift&quot;</span><span class="hl std">)[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##      lhs                                 rhs                                 support confidence      lift count
+## [1]  {B03,                                                                                                     
+##       Financial District/South Beach,                                                                          
+##       Winter}                         =&gt; {94105}                          0.01097316  0.6832151 18.361058   289
+## [2]  {B03,                                                                                                     
+##       Financial District/South Beach,                                                                          
+##       Summer}                         =&gt; {94105}                          0.01154270  0.6696035 17.995253   304
+## [3]  {B03,                                                                                                     
+##       Financial District/South Beach} =&gt; {94105}                          0.03553936  0.6536313 17.566007   936
+## [4]  {B03,                                                                                                     
+##       Financial District/South Beach,                                                                          
+##       Spring}                         =&gt; {94105}                          0.01028971  0.6302326 16.937178   271
+## [5]  {94103,                                                                                                   
+##       B03}                            =&gt; {South of Market}                0.03124881  0.7868069 11.069515   823
+## [6]  {94105,                                                                                                   
+##       B03}                            =&gt; {Financial District/South Beach} 0.03553936  1.0000000 10.883058   936
+## [7]  {94105,                                                                                                   
+##       B03,                                                                                                     
+##       Spring}                         =&gt; {Financial District/South Beach} 0.01028971  1.0000000 10.883058   271
+## [8]  {94105,                                                                                                   
+##       B03,                                                                                                     
+##       Summer}                         =&gt; {Financial District/South Beach} 0.01154270  1.0000000 10.883058   304
+## [9]  {94105,                                                                                                   
+##       B03,                                                                                                     
+##       Winter}                         =&gt; {Financial District/South Beach} 0.01097316  1.0000000 10.883058   289
+## [10] {94103,                                                                                                   
+##       B03,                                                                                                     
+##       Spring}                         =&gt; {South of Market}                0.01002392  0.7630058 10.734660   264
+## [11] {94102,                                                                                                   
+##       B03,                                                                                                     
+##       Winter}                         =&gt; {Tenderloin}                     0.01002392  0.9530686  9.839658   264
+## [12] {B03,                                                                                                     
+##       Tenderloin,                                                                                              
+##       Winter}                         =&gt; {94102}                          0.01002392  0.9530686  9.591505   264
+## [13] {94102,                                                                                                   
+##       B03}                            =&gt; {Tenderloin}                     0.02893268  0.9103943  9.399080   762
+## [14] {B03,                                                                                                     
+##       Tenderloin}                     =&gt; {94102}                          0.02893268  0.9270073  9.329229   762
+## [15] {B03,                                                                                                     
+##       South of Market,                                                                                         
+##       Spring}                         =&gt; {94103}                          0.01002392  0.6929134  6.701895   264
+## [16] {B03,                                                                                                     
+##       South of Market}                =&gt; {94103}                          0.03124881  0.6864053  6.638949   823
+## [17] {94158}                          =&gt; {B03}                            0.01002392  1.0000000  6.189659   264
+## [18] {94107,                                                                                                   
+##       South of Market}                =&gt; {B03}                            0.01393477  1.0000000  6.189659   367
+## [19] {Mission Bay}                    =&gt; {B03}                            0.01868094  0.9723320  6.018404   492
+## [20] {94105,                                                                                                   
+##       Spring}                         =&gt; {B03}                            0.01028971  0.9609929  5.948219   271
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Vizualising the association rules</span>
+<span class="hl com">#graph of rules for Battalion B03</span>
+<span class="hl kwd">plot</span><span class="hl std">(improv[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">],</span>
+     <span class="hl kwc">method</span> <span class="hl std">=</span> <span class="hl str">&quot;graph&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">control</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">&quot;items&quot;</span><span class="hl std">))</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Unknown control parameters: type
+</pre></div>
+<div class="output"><pre class="knitr r">## Available control parameters (with default values):
+## main	 =  Graph for 20 rules
+## nodeColors	 =  c(&quot;#66CC6680&quot;, &quot;#9999CC80&quot;)
+## nodeCol	 =  c(&quot;#EE0000FF&quot;, &quot;#EE0303FF&quot;, &quot;#EE0606FF&quot;, &quot;#EE0909FF&quot;, &quot;#EE0C0CFF&quot;, &quot;#EE0F0FFF&quot;, &quot;#EE1212FF&quot;, &quot;#EE1515FF&quot;, &quot;#EE1818FF&quot;, &quot;#EE1B1BFF&quot;, &quot;#EE1E1EFF&quot;, &quot;#EE2222FF&quot;, &quot;#EE2525FF&quot;, &quot;#EE2828FF&quot;, &quot;#EE2B2BFF&quot;, &quot;#EE2E2EFF&quot;, &quot;#EE3131FF&quot;, &quot;#EE3434FF&quot;, &quot;#EE3737FF&quot;, &quot;#EE3A3AFF&quot;, &quot;#EE3D3DFF&quot;, &quot;#EE4040FF&quot;, &quot;#EE4444FF&quot;, &quot;#EE4747FF&quot;, &quot;#EE4A4AFF&quot;, &quot;#EE4D4DFF&quot;, &quot;#EE5050FF&quot;, &quot;#EE5353FF&quot;, &quot;#EE5656FF&quot;, &quot;#EE5959FF&quot;, &quot;#EE5C5CFF&quot;, &quot;#EE5F5FFF&quot;, &quot;#EE6262FF&quot;, &quot;#EE6666FF&quot;, &quot;#EE6969FF&quot;, &quot;#EE6C6CFF&quot;, &quot;#EE6F6FFF&quot;, &quot;#EE7272FF&quot;, &quot;#EE7575FF&quot;,  &quot;#EE7878FF&quot;, &quot;#EE7B7BFF&quot;, &quot;#EE7E7EFF&quot;, &quot;#EE8181FF&quot;, &quot;#EE8484FF&quot;, &quot;#EE8888FF&quot;, &quot;#EE8B8BFF&quot;, &quot;#EE8E8EFF&quot;, &quot;#EE9191FF&quot;, &quot;#EE9494FF&quot;, &quot;#EE9797FF&quot;, &quot;#EE9999FF&quot;, &quot;#EE9B9BFF&quot;, &quot;#EE9D9DFF&quot;, &quot;#EE9F9FFF&quot;, &quot;#EEA0A0FF&quot;, &quot;#EEA2A2FF&quot;, &quot;#EEA4A4FF&quot;, &quot;#EEA5A5FF&quot;, &quot;#EEA7A7FF&quot;, &quot;#EEA9A9FF&quot;, &quot;#EEABABFF&quot;, &quot;#EEACACFF&quot;, &quot;#EEAEAEFF&quot;, &quot;#EEB0B0FF&quot;, &quot;#EEB1B1FF&quot;, &quot;#EEB3B3FF&quot;, &quot;#EEB5B5FF&quot;, &quot;#EEB7B7FF&quot;, &quot;#EEB8B8FF&quot;, &quot;#EEBABAFF&quot;, &quot;#EEBCBCFF&quot;, &quot;#EEBDBDFF&quot;, &quot;#EEBFBFFF&quot;, &quot;#EEC1C1FF&quot;, &quot;#EEC3C3FF&quot;, &quot;#EEC4C4FF&quot;, &quot;#EEC6C6FF&quot;, &quot;#EEC8C8FF&quot;,  &quot;#EEC9C9FF&quot;, &quot;#EECBCBFF&quot;, &quot;#EECDCDFF&quot;, &quot;#EECFCFFF&quot;, &quot;#EED0D0FF&quot;, &quot;#EED2D2FF&quot;, &quot;#EED4D4FF&quot;, &quot;#EED5D5FF&quot;, &quot;#EED7D7FF&quot;, &quot;#EED9D9FF&quot;, &quot;#EEDBDBFF&quot;, &quot;#EEDCDCFF&quot;, &quot;#EEDEDEFF&quot;, &quot;#EEE0E0FF&quot;, &quot;#EEE1E1FF&quot;, &quot;#EEE3E3FF&quot;, &quot;#EEE5E5FF&quot;, &quot;#EEE7E7FF&quot;, &quot;#EEE8E8FF&quot;, &quot;#EEEAEAFF&quot;, &quot;#EEECECFF&quot;, &quot;#EEEEEEFF&quot;)
+## edgeCol	 =  c(&quot;#474747FF&quot;, &quot;#494949FF&quot;, &quot;#4B4B4BFF&quot;, &quot;#4D4D4DFF&quot;, &quot;#4F4F4FFF&quot;, &quot;#515151FF&quot;, &quot;#535353FF&quot;, &quot;#555555FF&quot;, &quot;#575757FF&quot;, &quot;#595959FF&quot;, &quot;#5B5B5BFF&quot;, &quot;#5E5E5EFF&quot;, &quot;#606060FF&quot;, &quot;#626262FF&quot;, &quot;#646464FF&quot;, &quot;#666666FF&quot;, &quot;#686868FF&quot;, &quot;#6A6A6AFF&quot;, &quot;#6C6C6CFF&quot;, &quot;#6E6E6EFF&quot;, &quot;#707070FF&quot;, &quot;#727272FF&quot;, &quot;#747474FF&quot;, &quot;#767676FF&quot;, &quot;#787878FF&quot;, &quot;#7A7A7AFF&quot;, &quot;#7C7C7CFF&quot;, &quot;#7E7E7EFF&quot;, &quot;#808080FF&quot;, &quot;#828282FF&quot;, &quot;#848484FF&quot;, &quot;#868686FF&quot;, &quot;#888888FF&quot;, &quot;#8A8A8AFF&quot;, &quot;#8C8C8CFF&quot;, &quot;#8D8D8DFF&quot;, &quot;#8F8F8FFF&quot;, &quot;#919191FF&quot;, &quot;#939393FF&quot;,  &quot;#959595FF&quot;, &quot;#979797FF&quot;, &quot;#999999FF&quot;, &quot;#9A9A9AFF&quot;, &quot;#9C9C9CFF&quot;, &quot;#9E9E9EFF&quot;, &quot;#A0A0A0FF&quot;, &quot;#A2A2A2FF&quot;, &quot;#A3A3A3FF&quot;, &quot;#A5A5A5FF&quot;, &quot;#A7A7A7FF&quot;, &quot;#A9A9A9FF&quot;, &quot;#AAAAAAFF&quot;, &quot;#ACACACFF&quot;, &quot;#AEAEAEFF&quot;, &quot;#AFAFAFFF&quot;, &quot;#B1B1B1FF&quot;, &quot;#B3B3B3FF&quot;, &quot;#B4B4B4FF&quot;, &quot;#B6B6B6FF&quot;, &quot;#B7B7B7FF&quot;, &quot;#B9B9B9FF&quot;, &quot;#BBBBBBFF&quot;, &quot;#BCBCBCFF&quot;, &quot;#BEBEBEFF&quot;, &quot;#BFBFBFFF&quot;, &quot;#C1C1C1FF&quot;, &quot;#C2C2C2FF&quot;, &quot;#C3C3C4FF&quot;, &quot;#C5C5C5FF&quot;, &quot;#C6C6C6FF&quot;, &quot;#C8C8C8FF&quot;, &quot;#C9C9C9FF&quot;, &quot;#CACACAFF&quot;, &quot;#CCCCCCFF&quot;, &quot;#CDCDCDFF&quot;, &quot;#CECECEFF&quot;, &quot;#CFCFCFFF&quot;, &quot;#D1D1D1FF&quot;,  &quot;#D2D2D2FF&quot;, &quot;#D3D3D3FF&quot;, &quot;#D4D4D4FF&quot;, &quot;#D5D5D5FF&quot;, &quot;#D6D6D6FF&quot;, &quot;#D7D7D7FF&quot;, &quot;#D8D8D8FF&quot;, &quot;#D9D9D9FF&quot;, &quot;#DADADAFF&quot;, &quot;#DBDBDBFF&quot;, &quot;#DCDCDCFF&quot;, &quot;#DDDDDDFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DFDFDFFF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;)
+## alpha	 =  0.5
+## cex	 =  1
+## itemLabels	 =  TRUE
+## labelCol	 =  #000000B3
+## measureLabels	 =  FALSE
+## precision	 =  3
+## layout	 =  NULL
+## layoutParams	 =  list()
+## arrowSize	 =  0.5
+## engine	 =  igraph
+## plot	 =  TRUE
+## plot_options	 =  list()
+## max	 =  100
+## verbose	 =  FALSE
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-6.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl std">improv1</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">subset</span><span class="hl std">(firyrules,items</span> <span class="hl opt">%ain%</span> <span class="hl str">&quot;94103&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">inspect</span><span class="hl std">(</span><span class="hl kwd">sort</span><span class="hl std">(improv1,</span><span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;lift&quot;</span><span class="hl std">)[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##      lhs                              rhs                  support confidence      lift count
+## [1]  {94103,                                                                                 
+##       B03}                         =&gt; {South of Market} 0.03124881  0.7868069 11.069515   823
+## [2]  {94103,                                                                                 
+##       B03,                                                                                   
+##       Spring}                      =&gt; {South of Market} 0.01002392  0.7630058 10.734660   264
+## [3]  {B02,                                                                                   
+##       South of Market}             =&gt; {94103}           0.02335118  0.9840000  9.517300   615
+## [4]  {429 - multifamily dwellings,                                                           
+##       94103}                       =&gt; {South of Market} 0.01344117  0.6604478  9.291780   354
+## [5]  {429 - multifamily dwellings,                                                           
+##       South of Market}             =&gt; {94103}           0.01344117  0.8489209  8.210807   354
+## [6]  {South of Market,                                                                       
+##       Summer}                      =&gt; {94103}           0.01685841  0.8252788  7.982140   444
+## [7]  {94103,                                                                                 
+##       Spring}                      =&gt; {South of Market} 0.01833922  0.5629371  7.919911   483
+## [8]  {94103,                                                                                 
+##       Summer}                      =&gt; {South of Market} 0.01685841  0.5543071  7.798497   444
+## [9]  {South of Market,                                                                       
+##       Spring}                      =&gt; {94103}           0.01833922  0.7983471  7.721655   483
+## [10] {94103}                       =&gt; {South of Market} 0.05642252  0.5457216  7.677709  1486
+## [11] {South of Market}             =&gt; {94103}           0.05642252  0.7938034  7.677709  1486
+## [12] {94103,                                                                                 
+##       B02,                                                                                   
+##       Winter}                      =&gt; {Mission}         0.01135285  0.6040404  7.426990   299
+## [13] {South of Market,                                                                       
+##       Winter}                      =&gt; {94103}           0.01609902  0.7667269  7.415824   424
+## [14] {94103,                                                                                 
+##       Winter}                      =&gt; {South of Market} 0.01609902  0.5247525  7.382695   424
+## [15] {94103,                                                                                 
+##       B02}                         =&gt; {Mission}         0.03459012  0.5651365  6.948646   911
+## [16] {B02,                                                                                   
+##       Mission}                     =&gt; {94103}           0.03459012  0.6986196  6.757086   911
+## [17] {B02,                                                                                   
+##       Mission,                                                                               
+##       Winter}                      =&gt; {94103}           0.01135285  0.6937355  6.709846   299
+## [18] {B03,                                                                                   
+##       South of Market,                                                                       
+##       Spring}                      =&gt; {94103}           0.01002392  0.6929134  6.701895   264
+## [19] {B03,                                                                                   
+##       South of Market}             =&gt; {94103}           0.03124881  0.6864053  6.638949   823
+## [20] {94103,                                                                                 
+##       Mission,                                                                               
+##       Winter}                      =&gt; {B02}             0.01135285  0.9966667  6.382011   299
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#graph of rules for zipcode 94103</span>
+<span class="hl kwd">plot</span><span class="hl std">(improv1[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">],</span>
+     <span class="hl kwc">method</span> <span class="hl std">=</span> <span class="hl str">&quot;graph&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">control</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">&quot;items&quot;</span><span class="hl std">))</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Unknown control parameters: type
+</pre></div>
+<div class="output"><pre class="knitr r">## Available control parameters (with default values):
+## main	 =  Graph for 20 rules
+## nodeColors	 =  c(&quot;#66CC6680&quot;, &quot;#9999CC80&quot;)
+## nodeCol	 =  c(&quot;#EE0000FF&quot;, &quot;#EE0303FF&quot;, &quot;#EE0606FF&quot;, &quot;#EE0909FF&quot;, &quot;#EE0C0CFF&quot;, &quot;#EE0F0FFF&quot;, &quot;#EE1212FF&quot;, &quot;#EE1515FF&quot;, &quot;#EE1818FF&quot;, &quot;#EE1B1BFF&quot;, &quot;#EE1E1EFF&quot;, &quot;#EE2222FF&quot;, &quot;#EE2525FF&quot;, &quot;#EE2828FF&quot;, &quot;#EE2B2BFF&quot;, &quot;#EE2E2EFF&quot;, &quot;#EE3131FF&quot;, &quot;#EE3434FF&quot;, &quot;#EE3737FF&quot;, &quot;#EE3A3AFF&quot;, &quot;#EE3D3DFF&quot;, &quot;#EE4040FF&quot;, &quot;#EE4444FF&quot;, &quot;#EE4747FF&quot;, &quot;#EE4A4AFF&quot;, &quot;#EE4D4DFF&quot;, &quot;#EE5050FF&quot;, &quot;#EE5353FF&quot;, &quot;#EE5656FF&quot;, &quot;#EE5959FF&quot;, &quot;#EE5C5CFF&quot;, &quot;#EE5F5FFF&quot;, &quot;#EE6262FF&quot;, &quot;#EE6666FF&quot;, &quot;#EE6969FF&quot;, &quot;#EE6C6CFF&quot;, &quot;#EE6F6FFF&quot;, &quot;#EE7272FF&quot;, &quot;#EE7575FF&quot;,  &quot;#EE7878FF&quot;, &quot;#EE7B7BFF&quot;, &quot;#EE7E7EFF&quot;, &quot;#EE8181FF&quot;, &quot;#EE8484FF&quot;, &quot;#EE8888FF&quot;, &quot;#EE8B8BFF&quot;, &quot;#EE8E8EFF&quot;, &quot;#EE9191FF&quot;, &quot;#EE9494FF&quot;, &quot;#EE9797FF&quot;, &quot;#EE9999FF&quot;, &quot;#EE9B9BFF&quot;, &quot;#EE9D9DFF&quot;, &quot;#EE9F9FFF&quot;, &quot;#EEA0A0FF&quot;, &quot;#EEA2A2FF&quot;, &quot;#EEA4A4FF&quot;, &quot;#EEA5A5FF&quot;, &quot;#EEA7A7FF&quot;, &quot;#EEA9A9FF&quot;, &quot;#EEABABFF&quot;, &quot;#EEACACFF&quot;, &quot;#EEAEAEFF&quot;, &quot;#EEB0B0FF&quot;, &quot;#EEB1B1FF&quot;, &quot;#EEB3B3FF&quot;, &quot;#EEB5B5FF&quot;, &quot;#EEB7B7FF&quot;, &quot;#EEB8B8FF&quot;, &quot;#EEBABAFF&quot;, &quot;#EEBCBCFF&quot;, &quot;#EEBDBDFF&quot;, &quot;#EEBFBFFF&quot;, &quot;#EEC1C1FF&quot;, &quot;#EEC3C3FF&quot;, &quot;#EEC4C4FF&quot;, &quot;#EEC6C6FF&quot;, &quot;#EEC8C8FF&quot;,  &quot;#EEC9C9FF&quot;, &quot;#EECBCBFF&quot;, &quot;#EECDCDFF&quot;, &quot;#EECFCFFF&quot;, &quot;#EED0D0FF&quot;, &quot;#EED2D2FF&quot;, &quot;#EED4D4FF&quot;, &quot;#EED5D5FF&quot;, &quot;#EED7D7FF&quot;, &quot;#EED9D9FF&quot;, &quot;#EEDBDBFF&quot;, &quot;#EEDCDCFF&quot;, &quot;#EEDEDEFF&quot;, &quot;#EEE0E0FF&quot;, &quot;#EEE1E1FF&quot;, &quot;#EEE3E3FF&quot;, &quot;#EEE5E5FF&quot;, &quot;#EEE7E7FF&quot;, &quot;#EEE8E8FF&quot;, &quot;#EEEAEAFF&quot;, &quot;#EEECECFF&quot;, &quot;#EEEEEEFF&quot;)
+## edgeCol	 =  c(&quot;#474747FF&quot;, &quot;#494949FF&quot;, &quot;#4B4B4BFF&quot;, &quot;#4D4D4DFF&quot;, &quot;#4F4F4FFF&quot;, &quot;#515151FF&quot;, &quot;#535353FF&quot;, &quot;#555555FF&quot;, &quot;#575757FF&quot;, &quot;#595959FF&quot;, &quot;#5B5B5BFF&quot;, &quot;#5E5E5EFF&quot;, &quot;#606060FF&quot;, &quot;#626262FF&quot;, &quot;#646464FF&quot;, &quot;#666666FF&quot;, &quot;#686868FF&quot;, &quot;#6A6A6AFF&quot;, &quot;#6C6C6CFF&quot;, &quot;#6E6E6EFF&quot;, &quot;#707070FF&quot;, &quot;#727272FF&quot;, &quot;#747474FF&quot;, &quot;#767676FF&quot;, &quot;#787878FF&quot;, &quot;#7A7A7AFF&quot;, &quot;#7C7C7CFF&quot;, &quot;#7E7E7EFF&quot;, &quot;#808080FF&quot;, &quot;#828282FF&quot;, &quot;#848484FF&quot;, &quot;#868686FF&quot;, &quot;#888888FF&quot;, &quot;#8A8A8AFF&quot;, &quot;#8C8C8CFF&quot;, &quot;#8D8D8DFF&quot;, &quot;#8F8F8FFF&quot;, &quot;#919191FF&quot;, &quot;#939393FF&quot;,  &quot;#959595FF&quot;, &quot;#979797FF&quot;, &quot;#999999FF&quot;, &quot;#9A9A9AFF&quot;, &quot;#9C9C9CFF&quot;, &quot;#9E9E9EFF&quot;, &quot;#A0A0A0FF&quot;, &quot;#A2A2A2FF&quot;, &quot;#A3A3A3FF&quot;, &quot;#A5A5A5FF&quot;, &quot;#A7A7A7FF&quot;, &quot;#A9A9A9FF&quot;, &quot;#AAAAAAFF&quot;, &quot;#ACACACFF&quot;, &quot;#AEAEAEFF&quot;, &quot;#AFAFAFFF&quot;, &quot;#B1B1B1FF&quot;, &quot;#B3B3B3FF&quot;, &quot;#B4B4B4FF&quot;, &quot;#B6B6B6FF&quot;, &quot;#B7B7B7FF&quot;, &quot;#B9B9B9FF&quot;, &quot;#BBBBBBFF&quot;, &quot;#BCBCBCFF&quot;, &quot;#BEBEBEFF&quot;, &quot;#BFBFBFFF&quot;, &quot;#C1C1C1FF&quot;, &quot;#C2C2C2FF&quot;, &quot;#C3C3C4FF&quot;, &quot;#C5C5C5FF&quot;, &quot;#C6C6C6FF&quot;, &quot;#C8C8C8FF&quot;, &quot;#C9C9C9FF&quot;, &quot;#CACACAFF&quot;, &quot;#CCCCCCFF&quot;, &quot;#CDCDCDFF&quot;, &quot;#CECECEFF&quot;, &quot;#CFCFCFFF&quot;, &quot;#D1D1D1FF&quot;,  &quot;#D2D2D2FF&quot;, &quot;#D3D3D3FF&quot;, &quot;#D4D4D4FF&quot;, &quot;#D5D5D5FF&quot;, &quot;#D6D6D6FF&quot;, &quot;#D7D7D7FF&quot;, &quot;#D8D8D8FF&quot;, &quot;#D9D9D9FF&quot;, &quot;#DADADAFF&quot;, &quot;#DBDBDBFF&quot;, &quot;#DCDCDCFF&quot;, &quot;#DDDDDDFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DFDFDFFF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;)
+## alpha	 =  0.5
+## cex	 =  1
+## itemLabels	 =  TRUE
+## labelCol	 =  #000000B3
+## measureLabels	 =  FALSE
+## precision	 =  3
+## layout	 =  NULL
+## layoutParams	 =  list()
+## arrowSize	 =  0.5
+## engine	 =  igraph
+## plot	 =  TRUE
+## plot_options	 =  list()
+## max	 =  100
+## verbose	 =  FALSE
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-7.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl std">improv2</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">subset</span><span class="hl std">(firyrules,items</span> <span class="hl opt">%ain%</span> <span class="hl str">&quot;Winter&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">inspect</span><span class="hl std">(</span><span class="hl kwd">sort</span><span class="hl std">(improv2,</span><span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;lift&quot;</span><span class="hl std">)[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##      lhs                                 rhs                                 support confidence      lift count
+## [1]  {94124,                                                                                                   
+##       B10,                                                                                                     
+##       Winter}                         =&gt; {Bayview Hunters Point}          0.01328929  0.9408602 18.450808   350
+## [2]  {94124,                                                                                                   
+##       Winter}                         =&gt; {Bayview Hunters Point}          0.01336523  0.9386667 18.407792   352
+## [3]  {B03,                                                                                                     
+##       Financial District/South Beach,                                                                          
+##       Winter}                         =&gt; {94105}                          0.01097316  0.6832151 18.361058   289
+## [4]  {Bayview Hunters Point,                                                                                   
+##       Winter}                         =&gt; {94124}                          0.01336523  0.9287599 18.350150   352
+## [5]  {B10,                                                                                                     
+##       Bayview Hunters Point,                                                                                   
+##       Winter}                         =&gt; {94124}                          0.01328929  0.9283820 18.342682   350
+## [6]  {94112,                                                                                                   
+##       Winter}                         =&gt; {B09}                            0.01161864  0.9683544 14.400650   306
+## [7]  {B09,                                                                                                     
+##       Winter}                         =&gt; {94112}                          0.01161864  0.6023622 14.396019   306
+## [8]  {B08,                                                                                                     
+##       Winter}                         =&gt; {Sunset/Parkside}                0.01142879  0.4732704 12.744912   301
+## [9]  {Sunset/Parkside,                                                                                         
+##       Winter}                         =&gt; {B08}                            0.01142879  1.0000000 12.081193   301
+## [10] {B10,                                                                                                     
+##       Winter}                         =&gt; {Bayview Hunters Point}          0.01431446  0.5937008 11.642813   377
+## [11] {B10,                                                                                                     
+##       Winter}                         =&gt; {94124}                          0.01412462  0.5858268 11.574583   372
+## [12] {Bayview Hunters Point,                                                                                   
+##       Winter}                         =&gt; {B10}                            0.01431446  0.9947230 11.470236   377
+## [13] {94124,                                                                                                   
+##       Bayview Hunters Point,                                                                                   
+##       Winter}                         =&gt; {B10}                            0.01328929  0.9943182 11.465568   350
+## [14] {94124,                                                                                                   
+##       Winter}                         =&gt; {B10}                            0.01412462  0.9920000 11.438837   372
+## [15] {Financial District/South Beach,                                                                          
+##       Winter}                         =&gt; {94105}                          0.01150473  0.4083558 10.974354   303
+## [16] {94105,                                                                                                   
+##       Winter}                         =&gt; {Financial District/South Beach} 0.01150473  1.0000000 10.883058   303
+## [17] {94105,                                                                                                   
+##       B03,                                                                                                     
+##       Winter}                         =&gt; {Financial District/South Beach} 0.01097316  1.0000000 10.883058   289
+## [18] {94102,                                                                                                   
+##       B03,                                                                                                     
+##       Winter}                         =&gt; {Tenderloin}                     0.01002392  0.9530686  9.839658   264
+## [19] {B03,                                                                                                     
+##       Tenderloin,                                                                                              
+##       Winter}                         =&gt; {94102}                          0.01002392  0.9530686  9.591505   264
+## [20] {B06,                                                                                                     
+##       Winter}                         =&gt; {94110}                          0.01340320  0.6117851  8.597964   353
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#graph of rules for winter season</span>
+<span class="hl kwd">plot</span><span class="hl std">(improv2[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">],</span>
+     <span class="hl kwc">method</span> <span class="hl std">=</span> <span class="hl str">&quot;graph&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">control</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">&quot;items&quot;</span><span class="hl std">))</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Unknown control parameters: type
+</pre></div>
+<div class="output"><pre class="knitr r">## Available control parameters (with default values):
+## main	 =  Graph for 20 rules
+## nodeColors	 =  c(&quot;#66CC6680&quot;, &quot;#9999CC80&quot;)
+## nodeCol	 =  c(&quot;#EE0000FF&quot;, &quot;#EE0303FF&quot;, &quot;#EE0606FF&quot;, &quot;#EE0909FF&quot;, &quot;#EE0C0CFF&quot;, &quot;#EE0F0FFF&quot;, &quot;#EE1212FF&quot;, &quot;#EE1515FF&quot;, &quot;#EE1818FF&quot;, &quot;#EE1B1BFF&quot;, &quot;#EE1E1EFF&quot;, &quot;#EE2222FF&quot;, &quot;#EE2525FF&quot;, &quot;#EE2828FF&quot;, &quot;#EE2B2BFF&quot;, &quot;#EE2E2EFF&quot;, &quot;#EE3131FF&quot;, &quot;#EE3434FF&quot;, &quot;#EE3737FF&quot;, &quot;#EE3A3AFF&quot;, &quot;#EE3D3DFF&quot;, &quot;#EE4040FF&quot;, &quot;#EE4444FF&quot;, &quot;#EE4747FF&quot;, &quot;#EE4A4AFF&quot;, &quot;#EE4D4DFF&quot;, &quot;#EE5050FF&quot;, &quot;#EE5353FF&quot;, &quot;#EE5656FF&quot;, &quot;#EE5959FF&quot;, &quot;#EE5C5CFF&quot;, &quot;#EE5F5FFF&quot;, &quot;#EE6262FF&quot;, &quot;#EE6666FF&quot;, &quot;#EE6969FF&quot;, &quot;#EE6C6CFF&quot;, &quot;#EE6F6FFF&quot;, &quot;#EE7272FF&quot;, &quot;#EE7575FF&quot;,  &quot;#EE7878FF&quot;, &quot;#EE7B7BFF&quot;, &quot;#EE7E7EFF&quot;, &quot;#EE8181FF&quot;, &quot;#EE8484FF&quot;, &quot;#EE8888FF&quot;, &quot;#EE8B8BFF&quot;, &quot;#EE8E8EFF&quot;, &quot;#EE9191FF&quot;, &quot;#EE9494FF&quot;, &quot;#EE9797FF&quot;, &quot;#EE9999FF&quot;, &quot;#EE9B9BFF&quot;, &quot;#EE9D9DFF&quot;, &quot;#EE9F9FFF&quot;, &quot;#EEA0A0FF&quot;, &quot;#EEA2A2FF&quot;, &quot;#EEA4A4FF&quot;, &quot;#EEA5A5FF&quot;, &quot;#EEA7A7FF&quot;, &quot;#EEA9A9FF&quot;, &quot;#EEABABFF&quot;, &quot;#EEACACFF&quot;, &quot;#EEAEAEFF&quot;, &quot;#EEB0B0FF&quot;, &quot;#EEB1B1FF&quot;, &quot;#EEB3B3FF&quot;, &quot;#EEB5B5FF&quot;, &quot;#EEB7B7FF&quot;, &quot;#EEB8B8FF&quot;, &quot;#EEBABAFF&quot;, &quot;#EEBCBCFF&quot;, &quot;#EEBDBDFF&quot;, &quot;#EEBFBFFF&quot;, &quot;#EEC1C1FF&quot;, &quot;#EEC3C3FF&quot;, &quot;#EEC4C4FF&quot;, &quot;#EEC6C6FF&quot;, &quot;#EEC8C8FF&quot;,  &quot;#EEC9C9FF&quot;, &quot;#EECBCBFF&quot;, &quot;#EECDCDFF&quot;, &quot;#EECFCFFF&quot;, &quot;#EED0D0FF&quot;, &quot;#EED2D2FF&quot;, &quot;#EED4D4FF&quot;, &quot;#EED5D5FF&quot;, &quot;#EED7D7FF&quot;, &quot;#EED9D9FF&quot;, &quot;#EEDBDBFF&quot;, &quot;#EEDCDCFF&quot;, &quot;#EEDEDEFF&quot;, &quot;#EEE0E0FF&quot;, &quot;#EEE1E1FF&quot;, &quot;#EEE3E3FF&quot;, &quot;#EEE5E5FF&quot;, &quot;#EEE7E7FF&quot;, &quot;#EEE8E8FF&quot;, &quot;#EEEAEAFF&quot;, &quot;#EEECECFF&quot;, &quot;#EEEEEEFF&quot;)
+## edgeCol	 =  c(&quot;#474747FF&quot;, &quot;#494949FF&quot;, &quot;#4B4B4BFF&quot;, &quot;#4D4D4DFF&quot;, &quot;#4F4F4FFF&quot;, &quot;#515151FF&quot;, &quot;#535353FF&quot;, &quot;#555555FF&quot;, &quot;#575757FF&quot;, &quot;#595959FF&quot;, &quot;#5B5B5BFF&quot;, &quot;#5E5E5EFF&quot;, &quot;#606060FF&quot;, &quot;#626262FF&quot;, &quot;#646464FF&quot;, &quot;#666666FF&quot;, &quot;#686868FF&quot;, &quot;#6A6A6AFF&quot;, &quot;#6C6C6CFF&quot;, &quot;#6E6E6EFF&quot;, &quot;#707070FF&quot;, &quot;#727272FF&quot;, &quot;#747474FF&quot;, &quot;#767676FF&quot;, &quot;#787878FF&quot;, &quot;#7A7A7AFF&quot;, &quot;#7C7C7CFF&quot;, &quot;#7E7E7EFF&quot;, &quot;#808080FF&quot;, &quot;#828282FF&quot;, &quot;#848484FF&quot;, &quot;#868686FF&quot;, &quot;#888888FF&quot;, &quot;#8A8A8AFF&quot;, &quot;#8C8C8CFF&quot;, &quot;#8D8D8DFF&quot;, &quot;#8F8F8FFF&quot;, &quot;#919191FF&quot;, &quot;#939393FF&quot;,  &quot;#959595FF&quot;, &quot;#979797FF&quot;, &quot;#999999FF&quot;, &quot;#9A9A9AFF&quot;, &quot;#9C9C9CFF&quot;, &quot;#9E9E9EFF&quot;, &quot;#A0A0A0FF&quot;, &quot;#A2A2A2FF&quot;, &quot;#A3A3A3FF&quot;, &quot;#A5A5A5FF&quot;, &quot;#A7A7A7FF&quot;, &quot;#A9A9A9FF&quot;, &quot;#AAAAAAFF&quot;, &quot;#ACACACFF&quot;, &quot;#AEAEAEFF&quot;, &quot;#AFAFAFFF&quot;, &quot;#B1B1B1FF&quot;, &quot;#B3B3B3FF&quot;, &quot;#B4B4B4FF&quot;, &quot;#B6B6B6FF&quot;, &quot;#B7B7B7FF&quot;, &quot;#B9B9B9FF&quot;, &quot;#BBBBBBFF&quot;, &quot;#BCBCBCFF&quot;, &quot;#BEBEBEFF&quot;, &quot;#BFBFBFFF&quot;, &quot;#C1C1C1FF&quot;, &quot;#C2C2C2FF&quot;, &quot;#C3C3C4FF&quot;, &quot;#C5C5C5FF&quot;, &quot;#C6C6C6FF&quot;, &quot;#C8C8C8FF&quot;, &quot;#C9C9C9FF&quot;, &quot;#CACACAFF&quot;, &quot;#CCCCCCFF&quot;, &quot;#CDCDCDFF&quot;, &quot;#CECECEFF&quot;, &quot;#CFCFCFFF&quot;, &quot;#D1D1D1FF&quot;,  &quot;#D2D2D2FF&quot;, &quot;#D3D3D3FF&quot;, &quot;#D4D4D4FF&quot;, &quot;#D5D5D5FF&quot;, &quot;#D6D6D6FF&quot;, &quot;#D7D7D7FF&quot;, &quot;#D8D8D8FF&quot;, &quot;#D9D9D9FF&quot;, &quot;#DADADAFF&quot;, &quot;#DBDBDBFF&quot;, &quot;#DCDCDCFF&quot;, &quot;#DDDDDDFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DFDFDFFF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;)
+## alpha	 =  0.5
+## cex	 =  1
+## itemLabels	 =  TRUE
+## labelCol	 =  #000000B3
+## measureLabels	 =  FALSE
+## precision	 =  3
+## layout	 =  NULL
+## layoutParams	 =  list()
+## arrowSize	 =  0.5
+## engine	 =  igraph
+## plot	 =  TRUE
+## plot_options	 =  list()
+## max	 =  100
+## verbose	 =  FALSE
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-8.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl std">improv3</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">subset</span><span class="hl std">(firyrules,items</span> <span class="hl opt">%ain%</span> <span class="hl str">&quot;429 - multifamily dwellings&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">inspect</span><span class="hl std">(</span><span class="hl kwd">sort</span><span class="hl std">(improv3,</span><span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;lift&quot;</span><span class="hl std">)[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##      lhs                              rhs                  support confidence      lift count
+## [1]  {429 - multifamily dwellings,                                                           
+##       B04}                         =&gt; {Pacific Heights} 0.01196036  0.3250774 10.390247   315
+## [2]  {429 - multifamily dwellings,                                                           
+##       B01}                         =&gt; {94133}           0.01009986  0.3243902  9.888271   266
+## [3]  {429 - multifamily dwellings,                                                           
+##       94110}                       =&gt; {Mission}         0.01002392  0.7951807  9.777159   264
+## [4]  {429 - multifamily dwellings,                                                           
+##       94103}                       =&gt; {South of Market} 0.01344117  0.6604478  9.291780   354
+## [5]  {429 - multifamily dwellings,                                                           
+##       Pacific Heights}             =&gt; {B04}             0.01196036  0.9968354  9.202122   315
+## [6]  {429 - multifamily dwellings,                                                           
+##       Mission}                     =&gt; {94110}           0.01002392  0.6211765  8.729949   264
+## [7]  {429 - multifamily dwellings,                                                           
+##       South of Market}             =&gt; {94103}           0.01344117  0.8489209  8.210807   354
+## [8]  {429 - multifamily dwellings,                                                           
+##       94133}                       =&gt; {B01}             0.01009986  1.0000000  7.796625   266
+## [9]  {429 - multifamily dwellings,                                                           
+##       94102}                       =&gt; {Tenderloin}      0.01890876  0.7104137  7.334444   498
+## [10] {429 - multifamily dwellings,                                                           
+##       Tenderloin}                  =&gt; {94102}           0.01890876  0.6878453  6.922347   498
+## [11] {429 - multifamily dwellings,                                                           
+##       B04}                         =&gt; {94109}           0.01868094  0.5077399  6.042633   492
+## [12] {429 - multifamily dwellings,                                                           
+##       94109}                       =&gt; {B04}             0.01868094  0.5992692  5.532055   492
+## [13] {429 - multifamily dwellings,                                                           
+##       B03}                         =&gt; {South of Market} 0.01021377  0.3146199  4.426359   269
+## [14] {429 - multifamily dwellings,                                                           
+##       South of Market}             =&gt; {B03}             0.01021377  0.6450839  3.992850   269
+## [15] {429 - multifamily dwellings,                                                           
+##       94103}                       =&gt; {B02}             0.01211224  0.5951493  3.810952   319
+## [16] {429 - multifamily dwellings,                                                           
+##       B02}                         =&gt; {94102}           0.01511182  0.3674977  3.698428   398
+## [17] {429 - multifamily dwellings,                                                           
+##       94102}                       =&gt; {B02}             0.01511182  0.5677603  3.635571   398
+## [18] {429 - multifamily dwellings,                                                           
+##       B02}                         =&gt; {Tenderloin}      0.01150473  0.2797784  2.888484   303
+## [19] {429 - multifamily dwellings,                                                           
+##       B02}                         =&gt; {94103}           0.01211224  0.2945522  2.848924   319
+## [20] {429 - multifamily dwellings,                                                           
+##       Tenderloin}                  =&gt; {B02}             0.01150473  0.4185083  2.679857   303
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#graph of rules for multifamily dwellings property</span>
+<span class="hl kwd">plot</span><span class="hl std">(improv3[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">],</span>
+     <span class="hl kwc">method</span> <span class="hl std">=</span> <span class="hl str">&quot;graph&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">control</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">&quot;items&quot;</span><span class="hl std">))</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Unknown control parameters: type
+</pre></div>
+<div class="output"><pre class="knitr r">## Available control parameters (with default values):
+## main	 =  Graph for 20 rules
+## nodeColors	 =  c(&quot;#66CC6680&quot;, &quot;#9999CC80&quot;)
+## nodeCol	 =  c(&quot;#EE0000FF&quot;, &quot;#EE0303FF&quot;, &quot;#EE0606FF&quot;, &quot;#EE0909FF&quot;, &quot;#EE0C0CFF&quot;, &quot;#EE0F0FFF&quot;, &quot;#EE1212FF&quot;, &quot;#EE1515FF&quot;, &quot;#EE1818FF&quot;, &quot;#EE1B1BFF&quot;, &quot;#EE1E1EFF&quot;, &quot;#EE2222FF&quot;, &quot;#EE2525FF&quot;, &quot;#EE2828FF&quot;, &quot;#EE2B2BFF&quot;, &quot;#EE2E2EFF&quot;, &quot;#EE3131FF&quot;, &quot;#EE3434FF&quot;, &quot;#EE3737FF&quot;, &quot;#EE3A3AFF&quot;, &quot;#EE3D3DFF&quot;, &quot;#EE4040FF&quot;, &quot;#EE4444FF&quot;, &quot;#EE4747FF&quot;, &quot;#EE4A4AFF&quot;, &quot;#EE4D4DFF&quot;, &quot;#EE5050FF&quot;, &quot;#EE5353FF&quot;, &quot;#EE5656FF&quot;, &quot;#EE5959FF&quot;, &quot;#EE5C5CFF&quot;, &quot;#EE5F5FFF&quot;, &quot;#EE6262FF&quot;, &quot;#EE6666FF&quot;, &quot;#EE6969FF&quot;, &quot;#EE6C6CFF&quot;, &quot;#EE6F6FFF&quot;, &quot;#EE7272FF&quot;, &quot;#EE7575FF&quot;,  &quot;#EE7878FF&quot;, &quot;#EE7B7BFF&quot;, &quot;#EE7E7EFF&quot;, &quot;#EE8181FF&quot;, &quot;#EE8484FF&quot;, &quot;#EE8888FF&quot;, &quot;#EE8B8BFF&quot;, &quot;#EE8E8EFF&quot;, &quot;#EE9191FF&quot;, &quot;#EE9494FF&quot;, &quot;#EE9797FF&quot;, &quot;#EE9999FF&quot;, &quot;#EE9B9BFF&quot;, &quot;#EE9D9DFF&quot;, &quot;#EE9F9FFF&quot;, &quot;#EEA0A0FF&quot;, &quot;#EEA2A2FF&quot;, &quot;#EEA4A4FF&quot;, &quot;#EEA5A5FF&quot;, &quot;#EEA7A7FF&quot;, &quot;#EEA9A9FF&quot;, &quot;#EEABABFF&quot;, &quot;#EEACACFF&quot;, &quot;#EEAEAEFF&quot;, &quot;#EEB0B0FF&quot;, &quot;#EEB1B1FF&quot;, &quot;#EEB3B3FF&quot;, &quot;#EEB5B5FF&quot;, &quot;#EEB7B7FF&quot;, &quot;#EEB8B8FF&quot;, &quot;#EEBABAFF&quot;, &quot;#EEBCBCFF&quot;, &quot;#EEBDBDFF&quot;, &quot;#EEBFBFFF&quot;, &quot;#EEC1C1FF&quot;, &quot;#EEC3C3FF&quot;, &quot;#EEC4C4FF&quot;, &quot;#EEC6C6FF&quot;, &quot;#EEC8C8FF&quot;,  &quot;#EEC9C9FF&quot;, &quot;#EECBCBFF&quot;, &quot;#EECDCDFF&quot;, &quot;#EECFCFFF&quot;, &quot;#EED0D0FF&quot;, &quot;#EED2D2FF&quot;, &quot;#EED4D4FF&quot;, &quot;#EED5D5FF&quot;, &quot;#EED7D7FF&quot;, &quot;#EED9D9FF&quot;, &quot;#EEDBDBFF&quot;, &quot;#EEDCDCFF&quot;, &quot;#EEDEDEFF&quot;, &quot;#EEE0E0FF&quot;, &quot;#EEE1E1FF&quot;, &quot;#EEE3E3FF&quot;, &quot;#EEE5E5FF&quot;, &quot;#EEE7E7FF&quot;, &quot;#EEE8E8FF&quot;, &quot;#EEEAEAFF&quot;, &quot;#EEECECFF&quot;, &quot;#EEEEEEFF&quot;)
+## edgeCol	 =  c(&quot;#474747FF&quot;, &quot;#494949FF&quot;, &quot;#4B4B4BFF&quot;, &quot;#4D4D4DFF&quot;, &quot;#4F4F4FFF&quot;, &quot;#515151FF&quot;, &quot;#535353FF&quot;, &quot;#555555FF&quot;, &quot;#575757FF&quot;, &quot;#595959FF&quot;, &quot;#5B5B5BFF&quot;, &quot;#5E5E5EFF&quot;, &quot;#606060FF&quot;, &quot;#626262FF&quot;, &quot;#646464FF&quot;, &quot;#666666FF&quot;, &quot;#686868FF&quot;, &quot;#6A6A6AFF&quot;, &quot;#6C6C6CFF&quot;, &quot;#6E6E6EFF&quot;, &quot;#707070FF&quot;, &quot;#727272FF&quot;, &quot;#747474FF&quot;, &quot;#767676FF&quot;, &quot;#787878FF&quot;, &quot;#7A7A7AFF&quot;, &quot;#7C7C7CFF&quot;, &quot;#7E7E7EFF&quot;, &quot;#808080FF&quot;, &quot;#828282FF&quot;, &quot;#848484FF&quot;, &quot;#868686FF&quot;, &quot;#888888FF&quot;, &quot;#8A8A8AFF&quot;, &quot;#8C8C8CFF&quot;, &quot;#8D8D8DFF&quot;, &quot;#8F8F8FFF&quot;, &quot;#919191FF&quot;, &quot;#939393FF&quot;,  &quot;#959595FF&quot;, &quot;#979797FF&quot;, &quot;#999999FF&quot;, &quot;#9A9A9AFF&quot;, &quot;#9C9C9CFF&quot;, &quot;#9E9E9EFF&quot;, &quot;#A0A0A0FF&quot;, &quot;#A2A2A2FF&quot;, &quot;#A3A3A3FF&quot;, &quot;#A5A5A5FF&quot;, &quot;#A7A7A7FF&quot;, &quot;#A9A9A9FF&quot;, &quot;#AAAAAAFF&quot;, &quot;#ACACACFF&quot;, &quot;#AEAEAEFF&quot;, &quot;#AFAFAFFF&quot;, &quot;#B1B1B1FF&quot;, &quot;#B3B3B3FF&quot;, &quot;#B4B4B4FF&quot;, &quot;#B6B6B6FF&quot;, &quot;#B7B7B7FF&quot;, &quot;#B9B9B9FF&quot;, &quot;#BBBBBBFF&quot;, &quot;#BCBCBCFF&quot;, &quot;#BEBEBEFF&quot;, &quot;#BFBFBFFF&quot;, &quot;#C1C1C1FF&quot;, &quot;#C2C2C2FF&quot;, &quot;#C3C3C4FF&quot;, &quot;#C5C5C5FF&quot;, &quot;#C6C6C6FF&quot;, &quot;#C8C8C8FF&quot;, &quot;#C9C9C9FF&quot;, &quot;#CACACAFF&quot;, &quot;#CCCCCCFF&quot;, &quot;#CDCDCDFF&quot;, &quot;#CECECEFF&quot;, &quot;#CFCFCFFF&quot;, &quot;#D1D1D1FF&quot;,  &quot;#D2D2D2FF&quot;, &quot;#D3D3D3FF&quot;, &quot;#D4D4D4FF&quot;, &quot;#D5D5D5FF&quot;, &quot;#D6D6D6FF&quot;, &quot;#D7D7D7FF&quot;, &quot;#D8D8D8FF&quot;, &quot;#D9D9D9FF&quot;, &quot;#DADADAFF&quot;, &quot;#DBDBDBFF&quot;, &quot;#DCDCDCFF&quot;, &quot;#DDDDDDFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DFDFDFFF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;)
+## alpha	 =  0.5
+## cex	 =  1
+## itemLabels	 =  TRUE
+## labelCol	 =  #000000B3
+## measureLabels	 =  FALSE
+## precision	 =  3
+## layout	 =  NULL
+## layoutParams	 =  list()
+## arrowSize	 =  0.5
+## engine	 =  igraph
+## plot	 =  TRUE
+## plot_options	 =  list()
+## max	 =  100
+## verbose	 =  FALSE
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-9.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl std">improv4</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">subset</span><span class="hl std">(firyrules,items</span> <span class="hl opt">%ain%</span> <span class="hl str">&quot;Tenderloin&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">inspect</span><span class="hl std">(</span><span class="hl kwd">sort</span><span class="hl std">(improv4,</span><span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;lift&quot;</span><span class="hl std">)[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">])</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##      lhs                                                   rhs             support confidence      lift count
+## [1]  {B04,                                                                                                   
+##       Tenderloin}                                       =&gt; {94109}      0.01321335  0.8613861 10.251390   348
+## [2]  {94102,                                                                                                 
+##       B03,                                                                                                   
+##       Winter}                                           =&gt; {Tenderloin} 0.01002392  0.9530686  9.839658   264
+## [3]  {439 - boarding/rooming house, residential hotels,                                                      
+##       94102}                                            =&gt; {Tenderloin} 0.01765577  0.9432049  9.737823   465
+## [4]  {B03,                                                                                                   
+##       Tenderloin,                                                                                            
+##       Winter}                                           =&gt; {94102}      0.01002392  0.9530686  9.591505   264
+## [5]  {94102,                                                                                                 
+##       B03}                                              =&gt; {Tenderloin} 0.02893268  0.9103943  9.399080   762
+## [6]  {B03,                                                                                                   
+##       Tenderloin}                                       =&gt; {94102}      0.02893268  0.9270073  9.329229   762
+## [7]  {439 - boarding/rooming house, residential hotels,                                                      
+##       Tenderloin}                                       =&gt; {94102}      0.01765577  0.7894737  7.945116   465
+## [8]  {94102,                                                                                                 
+##       Winter}                                           =&gt; {Tenderloin} 0.02407260  0.7511848  7.755372   634
+## [9]  {Late-Afternoon,                                                                                        
+##       Tenderloin}                                       =&gt; {94102}      0.01101113  0.7474227  7.521922   290
+## [10] {B02,                                                                                                   
+##       Tenderloin}                                       =&gt; {94102}      0.03041349  0.7465051  7.512688   801
+## [11] {B02,                                                                                                   
+##       Tenderloin,                                                                                            
+##       Winter}                                           =&gt; {94102}      0.01093519  0.7461140  7.508752   288
+## [12] {Early-Afternoon,                                                                                       
+##       Tenderloin}                                       =&gt; {94102}      0.01059346  0.7440000  7.487477   279
+## [13] {94102,                                                                                                 
+##       Late-Afternoon}                                   =&gt; {Tenderloin} 0.01101113  0.7196030  7.429315   290
+## [14] {Early-Evening,                                                                                         
+##       Tenderloin}                                       =&gt; {94102}      0.01146676  0.7347932  7.394822   302
+## [15] {94102,                                                                                                 
+##       Early-Evening}                                    =&gt; {Tenderloin} 0.01146676  0.7139480  7.370932   302
+## [16] {94102,                                                                                                 
+##       Early-Afternoon}                                  =&gt; {Tenderloin} 0.01059346  0.7135550  7.366875   279
+## [17] {Tenderloin,                                                                                            
+##       Winter}                                           =&gt; {94102}      0.02407260  0.7304147  7.350758   634
+## [18] {429 - multifamily dwellings,                                                                           
+##       94102}                                            =&gt; {Tenderloin} 0.01890876  0.7104137  7.334444   498
+## [19] {Tenderloin}                                       =&gt; {94102}      0.07028135  0.7255978  7.302281  1851
+## [20] {94102}                                            =&gt; {Tenderloin} 0.07028135  0.7072984  7.302281  1851
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#graph of rules for Tenderloin neighborhood</span>
+<span class="hl kwd">plot</span><span class="hl std">(improv4[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">20</span><span class="hl std">],</span>
+     <span class="hl kwc">method</span> <span class="hl std">=</span> <span class="hl str">&quot;graph&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">control</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">&quot;items&quot;</span><span class="hl std">))</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Unknown control parameters: type
+</pre></div>
+<div class="output"><pre class="knitr r">## Available control parameters (with default values):
+## main	 =  Graph for 20 rules
+## nodeColors	 =  c(&quot;#66CC6680&quot;, &quot;#9999CC80&quot;)
+## nodeCol	 =  c(&quot;#EE0000FF&quot;, &quot;#EE0303FF&quot;, &quot;#EE0606FF&quot;, &quot;#EE0909FF&quot;, &quot;#EE0C0CFF&quot;, &quot;#EE0F0FFF&quot;, &quot;#EE1212FF&quot;, &quot;#EE1515FF&quot;, &quot;#EE1818FF&quot;, &quot;#EE1B1BFF&quot;, &quot;#EE1E1EFF&quot;, &quot;#EE2222FF&quot;, &quot;#EE2525FF&quot;, &quot;#EE2828FF&quot;, &quot;#EE2B2BFF&quot;, &quot;#EE2E2EFF&quot;, &quot;#EE3131FF&quot;, &quot;#EE3434FF&quot;, &quot;#EE3737FF&quot;, &quot;#EE3A3AFF&quot;, &quot;#EE3D3DFF&quot;, &quot;#EE4040FF&quot;, &quot;#EE4444FF&quot;, &quot;#EE4747FF&quot;, &quot;#EE4A4AFF&quot;, &quot;#EE4D4DFF&quot;, &quot;#EE5050FF&quot;, &quot;#EE5353FF&quot;, &quot;#EE5656FF&quot;, &quot;#EE5959FF&quot;, &quot;#EE5C5CFF&quot;, &quot;#EE5F5FFF&quot;, &quot;#EE6262FF&quot;, &quot;#EE6666FF&quot;, &quot;#EE6969FF&quot;, &quot;#EE6C6CFF&quot;, &quot;#EE6F6FFF&quot;, &quot;#EE7272FF&quot;, &quot;#EE7575FF&quot;,  &quot;#EE7878FF&quot;, &quot;#EE7B7BFF&quot;, &quot;#EE7E7EFF&quot;, &quot;#EE8181FF&quot;, &quot;#EE8484FF&quot;, &quot;#EE8888FF&quot;, &quot;#EE8B8BFF&quot;, &quot;#EE8E8EFF&quot;, &quot;#EE9191FF&quot;, &quot;#EE9494FF&quot;, &quot;#EE9797FF&quot;, &quot;#EE9999FF&quot;, &quot;#EE9B9BFF&quot;, &quot;#EE9D9DFF&quot;, &quot;#EE9F9FFF&quot;, &quot;#EEA0A0FF&quot;, &quot;#EEA2A2FF&quot;, &quot;#EEA4A4FF&quot;, &quot;#EEA5A5FF&quot;, &quot;#EEA7A7FF&quot;, &quot;#EEA9A9FF&quot;, &quot;#EEABABFF&quot;, &quot;#EEACACFF&quot;, &quot;#EEAEAEFF&quot;, &quot;#EEB0B0FF&quot;, &quot;#EEB1B1FF&quot;, &quot;#EEB3B3FF&quot;, &quot;#EEB5B5FF&quot;, &quot;#EEB7B7FF&quot;, &quot;#EEB8B8FF&quot;, &quot;#EEBABAFF&quot;, &quot;#EEBCBCFF&quot;, &quot;#EEBDBDFF&quot;, &quot;#EEBFBFFF&quot;, &quot;#EEC1C1FF&quot;, &quot;#EEC3C3FF&quot;, &quot;#EEC4C4FF&quot;, &quot;#EEC6C6FF&quot;, &quot;#EEC8C8FF&quot;,  &quot;#EEC9C9FF&quot;, &quot;#EECBCBFF&quot;, &quot;#EECDCDFF&quot;, &quot;#EECFCFFF&quot;, &quot;#EED0D0FF&quot;, &quot;#EED2D2FF&quot;, &quot;#EED4D4FF&quot;, &quot;#EED5D5FF&quot;, &quot;#EED7D7FF&quot;, &quot;#EED9D9FF&quot;, &quot;#EEDBDBFF&quot;, &quot;#EEDCDCFF&quot;, &quot;#EEDEDEFF&quot;, &quot;#EEE0E0FF&quot;, &quot;#EEE1E1FF&quot;, &quot;#EEE3E3FF&quot;, &quot;#EEE5E5FF&quot;, &quot;#EEE7E7FF&quot;, &quot;#EEE8E8FF&quot;, &quot;#EEEAEAFF&quot;, &quot;#EEECECFF&quot;, &quot;#EEEEEEFF&quot;)
+## edgeCol	 =  c(&quot;#474747FF&quot;, &quot;#494949FF&quot;, &quot;#4B4B4BFF&quot;, &quot;#4D4D4DFF&quot;, &quot;#4F4F4FFF&quot;, &quot;#515151FF&quot;, &quot;#535353FF&quot;, &quot;#555555FF&quot;, &quot;#575757FF&quot;, &quot;#595959FF&quot;, &quot;#5B5B5BFF&quot;, &quot;#5E5E5EFF&quot;, &quot;#606060FF&quot;, &quot;#626262FF&quot;, &quot;#646464FF&quot;, &quot;#666666FF&quot;, &quot;#686868FF&quot;, &quot;#6A6A6AFF&quot;, &quot;#6C6C6CFF&quot;, &quot;#6E6E6EFF&quot;, &quot;#707070FF&quot;, &quot;#727272FF&quot;, &quot;#747474FF&quot;, &quot;#767676FF&quot;, &quot;#787878FF&quot;, &quot;#7A7A7AFF&quot;, &quot;#7C7C7CFF&quot;, &quot;#7E7E7EFF&quot;, &quot;#808080FF&quot;, &quot;#828282FF&quot;, &quot;#848484FF&quot;, &quot;#868686FF&quot;, &quot;#888888FF&quot;, &quot;#8A8A8AFF&quot;, &quot;#8C8C8CFF&quot;, &quot;#8D8D8DFF&quot;, &quot;#8F8F8FFF&quot;, &quot;#919191FF&quot;, &quot;#939393FF&quot;,  &quot;#959595FF&quot;, &quot;#979797FF&quot;, &quot;#999999FF&quot;, &quot;#9A9A9AFF&quot;, &quot;#9C9C9CFF&quot;, &quot;#9E9E9EFF&quot;, &quot;#A0A0A0FF&quot;, &quot;#A2A2A2FF&quot;, &quot;#A3A3A3FF&quot;, &quot;#A5A5A5FF&quot;, &quot;#A7A7A7FF&quot;, &quot;#A9A9A9FF&quot;, &quot;#AAAAAAFF&quot;, &quot;#ACACACFF&quot;, &quot;#AEAEAEFF&quot;, &quot;#AFAFAFFF&quot;, &quot;#B1B1B1FF&quot;, &quot;#B3B3B3FF&quot;, &quot;#B4B4B4FF&quot;, &quot;#B6B6B6FF&quot;, &quot;#B7B7B7FF&quot;, &quot;#B9B9B9FF&quot;, &quot;#BBBBBBFF&quot;, &quot;#BCBCBCFF&quot;, &quot;#BEBEBEFF&quot;, &quot;#BFBFBFFF&quot;, &quot;#C1C1C1FF&quot;, &quot;#C2C2C2FF&quot;, &quot;#C3C3C4FF&quot;, &quot;#C5C5C5FF&quot;, &quot;#C6C6C6FF&quot;, &quot;#C8C8C8FF&quot;, &quot;#C9C9C9FF&quot;, &quot;#CACACAFF&quot;, &quot;#CCCCCCFF&quot;, &quot;#CDCDCDFF&quot;, &quot;#CECECEFF&quot;, &quot;#CFCFCFFF&quot;, &quot;#D1D1D1FF&quot;,  &quot;#D2D2D2FF&quot;, &quot;#D3D3D3FF&quot;, &quot;#D4D4D4FF&quot;, &quot;#D5D5D5FF&quot;, &quot;#D6D6D6FF&quot;, &quot;#D7D7D7FF&quot;, &quot;#D8D8D8FF&quot;, &quot;#D9D9D9FF&quot;, &quot;#DADADAFF&quot;, &quot;#DBDBDBFF&quot;, &quot;#DCDCDCFF&quot;, &quot;#DDDDDDFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DFDFDFFF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;)
+## alpha	 =  0.5
+## cex	 =  1
+## itemLabels	 =  TRUE
+## labelCol	 =  #000000B3
+## measureLabels	 =  FALSE
+## precision	 =  3
+## layout	 =  NULL
+## layoutParams	 =  list()
+## arrowSize	 =  0.5
+## engine	 =  igraph
+## plot	 =  TRUE
+## plot_options	 =  list()
+## max	 =  100
+## verbose	 =  FALSE
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-10.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div><div class="rcode">
+<div class="source"><pre class="knitr r"><span class="hl std">improv5</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">subset</span><span class="hl std">(firyrules,items</span> <span class="hl opt">%ain%</span> <span class="hl str">&quot;Late-Afternoon&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">inspect</span><span class="hl std">(</span><span class="hl kwd">sort</span><span class="hl std">(improv5,</span><span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;lift&quot;</span><span class="hl std">))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##     lhs                              rhs             support confidence      lift count
+## [1] {Late-Afternoon,                                                                   
+##      Tenderloin}                  =&gt; {94102}      0.01101113  0.7474227 7.5219225   290
+## [2] {94102,                                                                            
+##      Late-Afternoon}              =&gt; {Tenderloin} 0.01101113  0.7196030 7.4293154   290
+## [3] {429 - multifamily dwellings,                                                      
+##      Late-Afternoon}              =&gt; {Winter}     0.01188442  0.3409586 1.1345328   313
+## [4] {Late-Afternoon}              =&gt; {Winter}     0.05129665  0.3080255 1.0249486  1351
+## [5] {Late-Afternoon}              =&gt; {Spring}     0.04890458  0.2936617 0.9971850  1288
+## [6] {Late-Afternoon}              =&gt; {Summer}     0.04844895  0.2909257 0.9723489  1276
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#graph of rules for Late afternoon time period</span>
+<span class="hl kwd">plot</span><span class="hl std">(improv5,</span>
+     <span class="hl kwc">method</span> <span class="hl std">=</span> <span class="hl str">&quot;graph&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">control</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">&quot;items&quot;</span><span class="hl std">))</span>
+</pre></div>
+<div class="warning"><pre class="knitr r">## Warning: Unknown control parameters: type
+</pre></div>
+<div class="output"><pre class="knitr r">## Available control parameters (with default values):
+## main	 =  Graph for 6 rules
+## nodeColors	 =  c(&quot;#66CC6680&quot;, &quot;#9999CC80&quot;)
+## nodeCol	 =  c(&quot;#EE0000FF&quot;, &quot;#EE0303FF&quot;, &quot;#EE0606FF&quot;, &quot;#EE0909FF&quot;, &quot;#EE0C0CFF&quot;, &quot;#EE0F0FFF&quot;, &quot;#EE1212FF&quot;, &quot;#EE1515FF&quot;, &quot;#EE1818FF&quot;, &quot;#EE1B1BFF&quot;, &quot;#EE1E1EFF&quot;, &quot;#EE2222FF&quot;, &quot;#EE2525FF&quot;, &quot;#EE2828FF&quot;, &quot;#EE2B2BFF&quot;, &quot;#EE2E2EFF&quot;, &quot;#EE3131FF&quot;, &quot;#EE3434FF&quot;, &quot;#EE3737FF&quot;, &quot;#EE3A3AFF&quot;, &quot;#EE3D3DFF&quot;, &quot;#EE4040FF&quot;, &quot;#EE4444FF&quot;, &quot;#EE4747FF&quot;, &quot;#EE4A4AFF&quot;, &quot;#EE4D4DFF&quot;, &quot;#EE5050FF&quot;, &quot;#EE5353FF&quot;, &quot;#EE5656FF&quot;, &quot;#EE5959FF&quot;, &quot;#EE5C5CFF&quot;, &quot;#EE5F5FFF&quot;, &quot;#EE6262FF&quot;, &quot;#EE6666FF&quot;, &quot;#EE6969FF&quot;, &quot;#EE6C6CFF&quot;, &quot;#EE6F6FFF&quot;, &quot;#EE7272FF&quot;, &quot;#EE7575FF&quot;,  &quot;#EE7878FF&quot;, &quot;#EE7B7BFF&quot;, &quot;#EE7E7EFF&quot;, &quot;#EE8181FF&quot;, &quot;#EE8484FF&quot;, &quot;#EE8888FF&quot;, &quot;#EE8B8BFF&quot;, &quot;#EE8E8EFF&quot;, &quot;#EE9191FF&quot;, &quot;#EE9494FF&quot;, &quot;#EE9797FF&quot;, &quot;#EE9999FF&quot;, &quot;#EE9B9BFF&quot;, &quot;#EE9D9DFF&quot;, &quot;#EE9F9FFF&quot;, &quot;#EEA0A0FF&quot;, &quot;#EEA2A2FF&quot;, &quot;#EEA4A4FF&quot;, &quot;#EEA5A5FF&quot;, &quot;#EEA7A7FF&quot;, &quot;#EEA9A9FF&quot;, &quot;#EEABABFF&quot;, &quot;#EEACACFF&quot;, &quot;#EEAEAEFF&quot;, &quot;#EEB0B0FF&quot;, &quot;#EEB1B1FF&quot;, &quot;#EEB3B3FF&quot;, &quot;#EEB5B5FF&quot;, &quot;#EEB7B7FF&quot;, &quot;#EEB8B8FF&quot;, &quot;#EEBABAFF&quot;, &quot;#EEBCBCFF&quot;, &quot;#EEBDBDFF&quot;, &quot;#EEBFBFFF&quot;, &quot;#EEC1C1FF&quot;, &quot;#EEC3C3FF&quot;, &quot;#EEC4C4FF&quot;, &quot;#EEC6C6FF&quot;, &quot;#EEC8C8FF&quot;,  &quot;#EEC9C9FF&quot;, &quot;#EECBCBFF&quot;, &quot;#EECDCDFF&quot;, &quot;#EECFCFFF&quot;, &quot;#EED0D0FF&quot;, &quot;#EED2D2FF&quot;, &quot;#EED4D4FF&quot;, &quot;#EED5D5FF&quot;, &quot;#EED7D7FF&quot;, &quot;#EED9D9FF&quot;, &quot;#EEDBDBFF&quot;, &quot;#EEDCDCFF&quot;, &quot;#EEDEDEFF&quot;, &quot;#EEE0E0FF&quot;, &quot;#EEE1E1FF&quot;, &quot;#EEE3E3FF&quot;, &quot;#EEE5E5FF&quot;, &quot;#EEE7E7FF&quot;, &quot;#EEE8E8FF&quot;, &quot;#EEEAEAFF&quot;, &quot;#EEECECFF&quot;, &quot;#EEEEEEFF&quot;)
+## edgeCol	 =  c(&quot;#474747FF&quot;, &quot;#494949FF&quot;, &quot;#4B4B4BFF&quot;, &quot;#4D4D4DFF&quot;, &quot;#4F4F4FFF&quot;, &quot;#515151FF&quot;, &quot;#535353FF&quot;, &quot;#555555FF&quot;, &quot;#575757FF&quot;, &quot;#595959FF&quot;, &quot;#5B5B5BFF&quot;, &quot;#5E5E5EFF&quot;, &quot;#606060FF&quot;, &quot;#626262FF&quot;, &quot;#646464FF&quot;, &quot;#666666FF&quot;, &quot;#686868FF&quot;, &quot;#6A6A6AFF&quot;, &quot;#6C6C6CFF&quot;, &quot;#6E6E6EFF&quot;, &quot;#707070FF&quot;, &quot;#727272FF&quot;, &quot;#747474FF&quot;, &quot;#767676FF&quot;, &quot;#787878FF&quot;, &quot;#7A7A7AFF&quot;, &quot;#7C7C7CFF&quot;, &quot;#7E7E7EFF&quot;, &quot;#808080FF&quot;, &quot;#828282FF&quot;, &quot;#848484FF&quot;, &quot;#868686FF&quot;, &quot;#888888FF&quot;, &quot;#8A8A8AFF&quot;, &quot;#8C8C8CFF&quot;, &quot;#8D8D8DFF&quot;, &quot;#8F8F8FFF&quot;, &quot;#919191FF&quot;, &quot;#939393FF&quot;,  &quot;#959595FF&quot;, &quot;#979797FF&quot;, &quot;#999999FF&quot;, &quot;#9A9A9AFF&quot;, &quot;#9C9C9CFF&quot;, &quot;#9E9E9EFF&quot;, &quot;#A0A0A0FF&quot;, &quot;#A2A2A2FF&quot;, &quot;#A3A3A3FF&quot;, &quot;#A5A5A5FF&quot;, &quot;#A7A7A7FF&quot;, &quot;#A9A9A9FF&quot;, &quot;#AAAAAAFF&quot;, &quot;#ACACACFF&quot;, &quot;#AEAEAEFF&quot;, &quot;#AFAFAFFF&quot;, &quot;#B1B1B1FF&quot;, &quot;#B3B3B3FF&quot;, &quot;#B4B4B4FF&quot;, &quot;#B6B6B6FF&quot;, &quot;#B7B7B7FF&quot;, &quot;#B9B9B9FF&quot;, &quot;#BBBBBBFF&quot;, &quot;#BCBCBCFF&quot;, &quot;#BEBEBEFF&quot;, &quot;#BFBFBFFF&quot;, &quot;#C1C1C1FF&quot;, &quot;#C2C2C2FF&quot;, &quot;#C3C3C4FF&quot;, &quot;#C5C5C5FF&quot;, &quot;#C6C6C6FF&quot;, &quot;#C8C8C8FF&quot;, &quot;#C9C9C9FF&quot;, &quot;#CACACAFF&quot;, &quot;#CCCCCCFF&quot;, &quot;#CDCDCDFF&quot;, &quot;#CECECEFF&quot;, &quot;#CFCFCFFF&quot;, &quot;#D1D1D1FF&quot;,  &quot;#D2D2D2FF&quot;, &quot;#D3D3D3FF&quot;, &quot;#D4D4D4FF&quot;, &quot;#D5D5D5FF&quot;, &quot;#D6D6D6FF&quot;, &quot;#D7D7D7FF&quot;, &quot;#D8D8D8FF&quot;, &quot;#D9D9D9FF&quot;, &quot;#DADADAFF&quot;, &quot;#DBDBDBFF&quot;, &quot;#DCDCDCFF&quot;, &quot;#DDDDDDFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DEDEDEFF&quot;, &quot;#DFDFDFFF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E0E0E0FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E1E1E1FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;, &quot;#E2E2E2FF&quot;)
+## alpha	 =  0.5
+## cex	 =  1
+## itemLabels	 =  TRUE
+## labelCol	 =  #000000B3
+## measureLabels	 =  FALSE
+## precision	 =  3
+## layout	 =  NULL
+## layoutParams	 =  list()
+## arrowSize	 =  0.5
+## engine	 =  igraph
+## plot	 =  TRUE
+## plot_options	 =  list()
+## max	 =  100
+## verbose	 =  FALSE
+</pre></div>
+</div><div class="rimage default"><img src="figure/unnamed-chunk-1-11.png" title="plot of chunk unnamed-chunk-1" alt="plot of chunk unnamed-chunk-1" class="plot" /></div></div>
+
+
+
+<div class="chunk" id="unnamed-chunk-2"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl kwd">library</span><span class="hl std">(plotly)</span>
+</pre></div>
+<div class="message"><pre class="knitr r">## 
+## Attaching package: 'plotly'
+</pre></div>
+<div class="message"><pre class="knitr r">## The following object is masked from 'package:ggplot2':
+## 
+##     last_plot
+</pre></div>
+<div class="message"><pre class="knitr r">## The following object is masked from 'package:stats':
+## 
+##     filter
+</pre></div>
+<div class="message"><pre class="knitr r">## The following object is masked from 'package:graphics':
+## 
+##     layout
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">zip_plotly</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">plot_ly</span><span class="hl std">(bx_order,</span><span class="hl kwc">x</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">Zipcodes,</span><span class="hl kwc">y</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">Freq,</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">'bar'</span><span class="hl std">,</span>
+                      <span class="hl kwc">marker</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'navy'</span><span class="hl std">,</span> <span class="hl kwc">line</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'black'</span><span class="hl std">,</span><span class="hl kwc">width</span> <span class="hl std">=</span> <span class="hl num">2</span><span class="hl std">)))</span>
+<span class="hl std">zip_plotly</span>
+</pre></div>
+<div class="error"><pre class="knitr r">## Error in loadNamespace(name): there is no package called 'webshot'
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">Ssn_plotly</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">plot_ly</span><span class="hl std">(Ssn,</span><span class="hl kwc">x</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">season,</span><span class="hl kwc">y</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">Freq,</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">'bar'</span><span class="hl std">,</span>
+                      <span class="hl kwc">marker</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'silver'</span><span class="hl std">,</span> <span class="hl kwc">line</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'black'</span><span class="hl std">,</span><span class="hl kwc">width</span> <span class="hl std">=</span> <span class="hl num">2</span><span class="hl std">)))</span>
+<span class="hl std">Ssn_plotly</span>
+</pre></div>
+<div class="error"><pre class="knitr r">## Error in loadNamespace(name): there is no package called 'webshot'
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">Prop_plotly</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">plot_ly</span><span class="hl std">(Prop,</span><span class="hl kwc">x</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">property,</span><span class="hl kwc">y</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">Freq,</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">'bar'</span><span class="hl std">,</span>
+                       <span class="hl kwc">marker</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'red'</span><span class="hl std">,</span> <span class="hl kwc">line</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'black'</span><span class="hl std">,</span><span class="hl kwc">width</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">)))</span>
+<span class="hl std">Prop_plotly</span>
+</pre></div>
+<div class="error"><pre class="knitr r">## Error in loadNamespace(name): there is no package called 'webshot'
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">ND_plotly</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">plot_ly</span><span class="hl std">(ND,</span><span class="hl kwc">x</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">neighborhood,</span><span class="hl kwc">y</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">Freq,</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">'bar'</span><span class="hl std">,</span>
+                       <span class="hl kwc">marker</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'teal'</span><span class="hl std">,</span> <span class="hl kwc">line</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'black'</span><span class="hl std">,</span><span class="hl kwc">width</span> <span class="hl std">=</span> <span class="hl num">2</span><span class="hl std">)))</span>
+<span class="hl std">ND_plotly</span>
+</pre></div>
+<div class="error"><pre class="knitr r">## Error in loadNamespace(name): there is no package called 'webshot'
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">TP_plotly</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">plot_ly</span><span class="hl std">(TP,</span><span class="hl kwc">x</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">Timeperiod,</span><span class="hl kwc">y</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">Freq,</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">'bar'</span><span class="hl std">,</span>
+                     <span class="hl kwc">marker</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'rgb(199,21,133)'</span><span class="hl std">,</span> <span class="hl kwc">line</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'black'</span><span class="hl std">,</span><span class="hl kwc">width</span> <span class="hl std">=</span> <span class="hl num">2</span><span class="hl std">)))</span>
+<span class="hl std">TP_plotly</span>
+</pre></div>
+<div class="error"><pre class="knitr r">## Error in loadNamespace(name): there is no package called 'webshot'
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">Batt_plotly</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">plot_ly</span><span class="hl std">(Batt,</span><span class="hl kwc">x</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">battalion,</span><span class="hl kwc">y</span><span class="hl std">=</span><span class="hl opt">~</span><span class="hl std">Freq,</span><span class="hl kwc">type</span> <span class="hl std">=</span> <span class="hl str">'bar'</span><span class="hl std">,</span>
+                       <span class="hl kwc">marker</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'indigo'</span><span class="hl std">,</span> <span class="hl kwc">line</span> <span class="hl std">=</span> <span class="hl kwd">list</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">'black'</span><span class="hl std">,</span><span class="hl kwc">width</span> <span class="hl std">=</span> <span class="hl num">2</span><span class="hl std">)))</span>
+<span class="hl std">Batt_plotly</span>
+</pre></div>
+<div class="error"><pre class="knitr r">## Error in loadNamespace(name): there is no package called 'webshot'
+</pre></div>
+</div></div>
+</body>
+</html>
