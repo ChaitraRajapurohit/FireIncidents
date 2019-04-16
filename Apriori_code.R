@@ -7,8 +7,8 @@ library(chron) #for timeperiods
 library(plotly)
 library(arules)
 library(RColorBrewer)
-#library(robustbase)
 library(arulesViz)
+
 #Setting the working directory
 setwd('/Users/chaitra/Desktop/Capstone')
 getwd()
